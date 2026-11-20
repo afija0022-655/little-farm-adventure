@@ -3,7 +3,7 @@ import "./LevelChoose.css";
 
 const LEVELS = [
   { number: 1, icon: "🥕", title: "Beginner Farmer", description: "Carrots and first deliveries" },
-  { number: 2, icon: "🍅", title: "Vegetable Garden", description: "Your next farming adventure" },
+  { number: 2, icon: "🧅", title: "Vegetable & Chicken Farm", description: "Carrot, onion, chickens and eggs" },
   { number: 3, icon: "🐔", title: "Animal Farm", description: "Care for farm animals" },
   { number: 4, icon: "🐄", title: "Happy Farm", description: "Grow your farm further" },
   { number: 5, icon: "🌻", title: "Master Farmer", description: "Build a thriving farm" },
@@ -22,7 +22,7 @@ function readUnlockedLevel() {
 // Props match the existing StartPage.jsx usage:
 // <LevelChoose onBack={goToStart} onPlay={playLevelOne}
 //   musicOn={musicOn} onToggleMusic={toggleMusic} />
-export default function LevelChoose({ onBack, onPlay, musicOn, onToggleMusic }) {
+export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onToggleMusic }) {
   const [unlockedLevel, setUnlockedLevel] = useState(readUnlockedLevel);
   const [notice, setNotice] = useState("");
 
@@ -39,7 +39,12 @@ export default function LevelChoose({ onBack, onPlay, musicOn, onToggleMusic }) 
       return;
     }
 
-    // Level 2 is unlocked, but its game has not been created yet.
+    if (level === 2) {
+      if (onPlayLevel) onPlayLevel(2);
+      else setNotice("Level 2 is unlocked. Connect onPlayLevel in StartPage.jsx!");
+      return;
+    }
+
     setNotice(`🎉 Level ${level} is unlocked! Its gameplay will be added next.`);
   }
 
@@ -73,7 +78,7 @@ export default function LevelChoose({ onBack, onPlay, musicOn, onToggleMusic }) 
                   <div className="lc-level-button lc-disabled">🔒 LOCKED</div>
                 ) : (
                   <button type="button" className="lc-level-button" onClick={() => selectLevel(level.number)}>
-                    {level.number === 1 ? "▶ PLAY" : "🔓 OPEN LEVEL"}
+                    {level.number <= 2 ? "▶ PLAY" : "🔓 OPEN LEVEL"}
                   </button>
                 )}
                 {done && <span className="lc-cleared">✅ CLEARED</span>}

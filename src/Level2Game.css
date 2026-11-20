@@ -1,0 +1,383 @@
+/* Level 2 uses its own classes: Level 1 CSS is untouched. */
+.l2-game,.l2-game *{box-sizing:border-box}
+.l2-game{position:fixed;inset:0;z-index:30;height:100dvh;padding:10px 16px 14px;display:flex;flex-direction:column;gap:10px;overflow:hidden;font-family:"Trebuchet MS",Arial,sans-serif;color:#315b3d;background:linear-gradient(#b7edfa 0 43%,#a8d784 43% 100%)}
+.l2-topbar{flex:0 0 auto;display:grid;grid-template-columns:1fr 360px 1fr;gap:10px;align-items:center}
+.l2-top-actions{display:flex;gap:8px}
+.l2-top-actions button{width:45px;height:45px;border:3px solid white;border-radius:50%;background:#288044;color:white;font-size:25px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #12552c}
+.l2-top-actions button:nth-child(2){background:#dda839;box-shadow:0 3px 0 #a47719}
+.l2-clock{text-align:center;background:#fff8df;border:3px solid #bad888;border-radius:17px;padding:6px 12px;min-width:0}
+.l2-clock strong{color:#267b4b;font-size:20px}
+.l2-clock small{display:block;font-size:10px;font-weight:800}
+.l2-clock.urgent{border-color:#ed5b5b;background:#fff0eb;animation:l2-pulse .5s infinite alternate}
+.l2-clock.urgent strong{color:#c42c2c}
+@keyframes l2-pulse{to{box-shadow:0 0 12px #f66}}
+.l2-track{height:6px;margin:5px 0 3px;background:#e1e5cc;border-radius:10px;overflow:hidden}
+.l2-track span{display:block;height:100%;background:#53a959}
+.l2-wallet{justify-self:end;background:#fff3d3;padding:13px;border:2px solid #e7c881;border-radius:15px;font-size:17px}
+.l2-layout{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px}
+.l2-left{min-width:0;min-height:0;padding:8px 10px;display:flex;flex-direction:column;background:#fff7dc;border:3px solid #eacb85;border-radius:21px}
+.l2-heading{display:flex;justify-content:space-between;font-size:13px;font-weight:900;padding:4px 5px 8px}
+.l2-board{position:relative;isolation:isolate;flex:1;min-height:0;overflow:hidden;border:6px solid #719c42;border-radius:15px;background:#78b000 url('/level1background.jpg') center/450px 450px repeat}
+.l2-barn{position:absolute;z-index:1;right:1%;top:2%;width:28%;height:39%;object-fit:contain;pointer-events:none}
+.l2-plot-wrap{position:absolute;z-index:4;width:10.8%;height:19%;transform:translate(-50%,-50%)}
+.l2-plot{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px;background:#b98050;color:white;border:3px solid #956238;border-radius:13px;box-shadow:0 4px 0 #774a2d;cursor:pointer}
+.l2-plot>span{font-size:clamp(19px,2.6vw,34px);line-height:1}
+.l2-plot>b{font-size:clamp(8px,.85vw,12px);text-shadow:0 1px 2px #654}
+.l2-plot small{font-size:10px}
+.l2-plot img{width:55%;max-height:60%;object-fit:contain}
+.l2-plot:disabled{opacity:1;cursor:default}
+.l2-ready{background:#c99746;border-color:#ffe373;animation:l2-glow 1s infinite alternate}
+@keyframes l2-glow{to{box-shadow:0 0 18px #ffec91}}
+.l2-dead{background:#776b5b}
+.l2-thirsty{border-color:#eac44b}
+.l2-plot-water{position:absolute;right:-13px;top:-16px;z-index:12;min-width:43px;min-height:45px;padding:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #62b6d5;border-radius:10px;background:#e8fbff;color:#12627d;font-size:16px;font-weight:900;cursor:pointer}
+.l2-plot-water small{font-size:10px}
+.l2-plot-water img{display:block;width:30px;height:30px;object-fit:contain}
+.l2-plot-water{gap:0;background:#e8faff;box-shadow:0 2px 5px #1234}
+.l2-farmer{position:absolute;z-index:20;width:clamp(80px,6.8vw,108px);height:clamp(108px,13.5vh,135px);transform:translate(-50%,-32%);pointer-events:none;transition:none;will-change:left,top}
+.l2-farmer img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 3px #3545)}
+.l2-speech{position:absolute;top:6%;bottom:auto;left:80%;transform:none;z-index:15;background:white;border:2px solid #dfc98a;padding:5px 9px;border-radius:12px;white-space:nowrap;font-size:12px;font-weight:900}
+/* NEAT CHICKEN PEN — bottom-left, BELOW the eight planting plots.
+   The chicken pen does NOT overlap the barn, truck, farmer or plots. */
+.l2-chicken-pen {
+  position: absolute;
+  left: 5%;
+  top: 68%;
+  width: 45%;
+  height: 27%;
+  z-index: 7;
+  pointer-events: none;
+  border: 5px solid #97501e;
+  border-radius: 16px;
+  background: rgba(226, 192, 104, .15);
+  box-shadow: inset 0 0 0 3px #d89b53, 0 4px 8px #23391533;
+}
+/* Wooden rails running vertically on the two sides of the fence. */
+.l2-chicken-pen::before,
+.l2-chicken-pen::after {
+  content: "";
+  position: absolute;
+  top: 18%;
+  bottom: 17%;
+  width: 10px;
+  border: 2px solid #754017;
+  border-radius: 4px;
+  background: repeating-linear-gradient(
+    90deg, #9e511e 0px, #ca7b37 3px, #98501f 5px
+  );
+  z-index: 2;
+}
+.l2-chicken-pen::before { left: -7px; }
+.l2-chicken-pen::after { right: -7px; }
+/* Slimmer back/front rails leave enough open grass for the farmer to
+   stand inside the enclosure without intersecting either fence image. */
+.l2-pen-fence {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 18%;
+  left: 0;
+  object-fit: fill;
+  filter: drop-shadow(0 2px 1px #463c2533);
+  pointer-events: none;
+}
+/* Rear/front separate: chickens walk between both rails. */
+.l2-pen-fence-back { top: 0; z-index: 1; }
+.l2-pen-fence-front { bottom: 0; z-index: 13; }
+
+/* CHICKENS are CHILDREN of the pen; left/top are pen-relative %. */
+.l2-chicken{position:absolute;z-index:11;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translate(-50%,-50%);transition:left 1.1s ease,top 1.1s ease;width:clamp(52px,5.1vw,78px);height:clamp(60px,9.7vh,92px);pointer-events:none}
+.l2-hen-photo{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 3px #3545);user-select:none}
+.l2-chicken-thirsty{transition:none !important} /* Freeze immediately when watering is requested */
+.l2-chicken-dead{transition:none !important}
+.l2-chicken-dead .l2-hen-photo{filter:grayscale(1) opacity(.55)}
+.l2-hen-water{position:absolute;z-index:15;bottom:98%;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:56px;min-height:66px;padding:4px;border:2px solid #56b6d5;border-radius:12px;background:#e7faff;color:#125d85;font-weight:900;cursor:pointer;pointer-events:auto;box-shadow:0 3px 9px #25537e55;animation:l2-bucket-bounce .7s infinite alternate}
+.l2-hen-water img{display:block;width:37px;height:37px;object-fit:contain}
+.l2-hen-water span{font-size:12px}
+@keyframes l2-bucket-bounce{to{transform:translate(-50%,-4px)}}
+.l2-hen-status{position:absolute;top:97%;left:50%;transform:translateX(-50%);background:#fff4d7;color:#755024;padding:4px 6px;border:2px solid #e3d19d;border-radius:10px;white-space:nowrap;font-size:10px;font-weight:900}
+.l2-hen-rip{background:#fff2f2;color:#9c3030;border-color:#d99}
+/* Put every chicken status ABOVE its head; never underneath. */
+.l2-hen-status { top: auto; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); z-index: 22; pointer-events: none; }
+.l2-hen-rip { bottom: calc(100% + 9px); font-size: 12px; }
+.l2-truck{position:absolute;z-index:13;right:2%;bottom:-3px;width:min(24%,270px);display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.l2-truck-visual{position:relative;width:100%;aspect-ratio:1209/499;isolation:isolate}
+.l2-truck-visual>img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:2}
+.l2-cargo-icons{position:absolute;z-index:1;left:59%;top:15%;width:37%;height:27%;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,1fr);align-items:center;justify-items:center}
+.l2-cargo-icons span{font-size:clamp(9px,1vw,15px)}
+.l2-truck-label{position:absolute;left:-76px;top:22%;background:#fff3d3;padding:4px 9px;border-radius:13px;font-size:12px;font-weight:900;white-space:nowrap}
+.l2-go{position:absolute;left:-76px;top:52%;z-index:15;padding:8px 13px;background:#48a451;color:white;border:2px solid white;border-radius:12px;font-weight:900;cursor:pointer;pointer-events:auto;white-space:nowrap}
+.l2-go:disabled{opacity:.55;cursor:default}
+.l2-driving{animation:l2-drive 2.6s linear both}
+@keyframes l2-drive{to{transform:translateX(-130vw)}}
+.l2-message{flex-shrink:0;margin-top:7px;padding:9px 12px;min-height:38px;display:flex;align-items:center;background:#e5f3db;border:2px solid #b6daa7;border-radius:12px;font-size:12px;font-weight:800}
+.l2-sidebar{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto;scrollbar-width:thin}
+.l2-panel{padding:13px;background:#fff8e9;border:3px solid #e6cf95;border-radius:17px}
+.l2-panel h2{margin:0 0 9px;color:#337547;font-size:17px}
+.l2-panel p{margin:6px 0;font-size:12px;line-height:1.35}
+.l2-panel small{font-size:10px;color:#63816b}
+.l2-seed-select{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.l2-seed-select button{padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#e6efd9;border:3px solid transparent;border-radius:12px;font-size:14px;font-weight:900;color:#3a653f;cursor:pointer}
+.l2-seed-select button.active{border-color:#dcaa37;background:#fff0ae}
+.l2-panel>button{display:block;width:100%;margin:6px 0;padding:9px 7px;border:0;border-radius:9px;background:#f1bf5b;color:#6a4615;font-weight:900;font-size:11px;cursor:pointer}
+.l2-panel button:disabled{opacity:.5;cursor:default}
+.l2-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:15px;background:#153e27c7;backdrop-filter:blur(5px)}
+.l2-modal{width:min(100%,460px);padding:28px;background:#fff8e4;border:5px solid #f2ce76;border-radius:25px;text-align:center;box-shadow:0 15px 50px #153e27aa}
+.l2-modal h2{color:#347b4c;font:700 30px Georgia,serif}
+.l2-modal p{font-size:14px}
+.l2-modal h3{padding:12px;background:#e3f2dc;border-radius:12px;color:#247447}
+.l2-modal button{padding:12px 19px;background:#42a45d;color:white;border:0;border-radius:12px;font-weight:900;cursor:pointer}
+.l2-modal-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.l2-trophy{font-size:56px}
+.l2-paused .l2-driving,.l2-paused .l2-ready,.l2-paused .l2-ground-egg,.l2-paused .l2-hen-water,.l2-paused .l2-clock.urgent{animation-play-state:paused!important}
+.l2-paused .l2-chicken{transition:none!important}
+@media(max-height:700px){.l2-game{gap:5px;padding:5px 9px}.l2-top-actions button{width:35px;height:35px;font-size:20px}.l2-clock{padding:3px}.l2-clock strong{font-size:16px}.l2-panel{padding:8px}.l2-panel h2{font-size:14px}.l2-panel p{font-size:11px}.l2-left{padding:5px}}
+@media(max-width:900px){.l2-layout{grid-template-columns:minmax(0,1fr) 225px;gap:6px}.l2-topbar{grid-template-columns:1fr 270px 1fr}.l2-seed-select button{font-size:11px}}
+@media(max-width:650px){.l2-game{padding:5px;gap:5px}.l2-topbar{grid-template-columns:auto minmax(0,1fr) auto;gap:5px}.l2-top-actions{gap:3px}.l2-top-actions button{width:29px;height:29px;font-size:15px}.l2-clock strong{font-size:13px}.l2-clock small{font-size:7px}.l2-wallet{font-size:10px;padding:5px}.l2-layout{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.l2-board{background-size:320px 320px;border-width:3px}.l2-left{border-width:2px}.l2-heading{font-size:10px}.l2-plot{border-width:2px;border-radius:6px}.l2-plot>span{font-size:15px}.l2-plot>b,.l2-plot small{font-size:7px}.l2-plot-water{min-width:25px;min-height:29px;right:-8px;top:-9px;font-size:10px}.l2-farmer{width:60px;height:82px}.l2-chicken{width:43px;height:55px}.l2-hen-water{width:35px;min-height:42px;padding:2px;bottom:95%}.l2-hen-water img{width:23px;height:23px}.l2-hen-water span{font-size:8px}.l2-ground-egg,.l2-hen-status{font-size:8px;padding:3px}.l2-truck{width:25%}.l2-go{left:-40px;top:44%;padding:4px;font-size:8px}.l2-truck-label{left:-40px;top:15%;font-size:8px;padding:2px}.l2-cargo-icons span{font-size:7px}.l2-message{min-height:25px;font-size:9px;padding:4px}.l2-sidebar{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:165px}.l2-panel{padding:5px;border-width:2px}.l2-panel h2{font-size:11px;margin:0 0 5px}.l2-panel p{font-size:9px}.l2-panel small{font-size:8px}.l2-panel>button{font-size:8px;padding:5px}.l2-seed-select button{padding:5px;font-size:9px}.l2-seed-select small{font-size:7px}}
+
+/* Keep chicken enclosure orderly on smaller screens. */
+@media (max-width: 650px) {
+  .l2-chicken-pen { left: 5%; top: 68%; width: 45%; height: 27%; border-width: 3px; }
+  .l2-pen-fence { height: 18%; }
+  .l2-chicken { width: 42px; height: 56px; }
+}
+
+/* EGGS ON THE GRASS: independent of moving hens.
+   No floating "COLLECT EGG" label — the egg itself is the clickable item. */
+.l2-ground-egg {
+  position: absolute;
+  z-index: 18; /* in front of the lower wooden fence rail */
+  width: clamp(36px, 3.5vw, 48px);
+  height: clamp(40px, 4vw, 52px);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  font-size: clamp(28px, 2.7vw, 37px);
+  line-height: 1;
+  text-shadow: 0 2px 4px #6548;
+  filter: drop-shadow(0 3px 1px #4a541f65);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: l2-ground-egg-pop 1s infinite alternate;
+}
+.l2-ground-egg::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  width: 62%;
+  height: 5px;
+  border-radius: 50%;
+  background: #324d223f;
+  pointer-events: none;
+}
+.l2-ground-egg:hover {
+  filter: drop-shadow(0 0 7px #ffdf70);
+}
+.l2-ground-egg:disabled {
+  cursor: default;
+}
+@keyframes l2-ground-egg-pop {
+  to { transform: translate(-50%, -56%); }
+}
+@media (max-width: 650px) {
+  .l2-ground-egg { width: 32px; height: 36px; font-size: 26px; }
+}
+
+/* Level 2: no visible Chicken Pen sign or numbered chicken labels. */
+.l2-pen-title, .l2-pen-label, .pen-title, .l2-chicken-name { display: none !important; }
+/* Egg is a clickable collect action on the grass, not a speech bubble. */
+.l2-ground-egg {
+  width: 90px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  overflow: visible;
+}
+.l2-egg-icon { font-size: clamp(25px, 2.6vw, 36px); line-height: 1; }
+.l2-egg-caption {
+  display: block;
+  padding: 3px 6px;
+  background: #fff8df;
+  border: 1px solid #d7b777;
+  border-radius: 9px;
+  color: #6b4b20;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-shadow: none;
+}
+.l2-ground-egg:disabled { opacity: .73; }
+@media(max-width:650px) {
+  .l2-ground-egg { width: 70px; height: 52px; }
+  .l2-egg-caption { font-size: 7px; padding: 2px 4px; }
+}
+
+/* Level 2 farmer stays fully inside the top edge even on shorter screens. */
+@media (max-width: 650px) {
+  .l2-farmer { width: 64px; height: 85px; transform: translate(-50%, -22%); }
+  .l2-speech { font-size: 9px; padding: 3px 5px; }
+}
+
+/* Smooth frame-based walking. The LAST position persists until a new command. */
+.l2-farmer-walking img {
+  animation: l2-farmer-walk-bob 320ms ease-in-out infinite alternate;
+}
+@keyframes l2-farmer-walk-bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+.l2-paused .l2-farmer-walking img {
+  animation-play-state: paused !important;
+}
+
+
+/* LEVEL 2 COMPLETE / GAME OVER — MATCH LEVEL 1 RESULT SCREEN */
+.l2-result-overlay {
+  z-index: 2000;
+  background: #163b2dcc;
+  backdrop-filter: blur(5px);
+  padding: 20px;
+}
+.l2-result-card {
+  width: min(100%, 460px);
+  max-height: min(92dvh, 820px);
+  overflow-y: auto;
+  padding: 25px;
+  border: 5px solid #f6d47d;
+  border-radius: 27px;
+  background: #fff8e5;
+  color: #345b3c;
+  text-align: center;
+  box-shadow: 0 18px 40px #173c2870;
+  scrollbar-width: thin;
+}
+.l2-result-trophy { font-size: 62px; line-height: 1.1; }
+.l2-result-card h2 {
+  margin: 8px 0 10px;
+  color: #378449;
+  font: 700 29px Georgia, serif;
+}
+.l2-result-card .l2-result-intro {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.l2-result-list {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f3eedb;
+  text-align: left;
+}
+.l2-result-card .l2-result-list p {
+  margin: 7px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.l2-result-reward {
+  margin: 14px 0;
+  padding: 13px;
+  border-radius: 13px;
+  background: #ffe8ae;
+  color: #a07623;
+  font-size: 19px;
+  font-weight: 900;
+}
+.l2-result-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin: 12px 0 6px;
+  padding: 12px;
+  border: 2px solid #95cb81;
+  border-radius: 14px;
+  background: #e4f5d9;
+  color: #286f3d;
+  font-weight: 900;
+}
+.l2-result-total strong {
+  font-size: 25px;
+  font-variant-numeric: tabular-nums;
+}
+.l2-result-card .l2-result-wallet {
+  margin: 8px 0;
+  color: #6a765b;
+  font-size: 12px;
+}
+.l2-result-card .l2-result-unlocked {
+  margin: 14px 0 8px;
+  color: #345b3c;
+  font-size: 14px;
+}
+.l2-result-card .l2-result-lose-note {
+  margin: 14px 0 8px;
+  color: #ae4444;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.l2-result-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.l2-result-card .l2-result-button {
+  margin: 0;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #4ca260;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.l2-result-card .l2-result-next {
+  background: #dfa439;
+  color: #fff;
+}
+.l2-result-card .l2-result-button:hover { filter: brightness(1.06); }
+@media (max-width: 460px) {
+  .l2-result-card { padding: 17px 14px; }
+  .l2-result-card h2 { font-size: 26px; }
+  .l2-result-card .l2-result-list p { font-size: 12px; }
+  .l2-result-reward { font-size: 16px; }
+  .l2-result-card .l2-result-button { padding: 10px 14px; font-size: 13px; }
+}
+
+
+/* FIX: FARMER STANDS *INSIDE* THE CHICKEN PEN, CLEAR OF ITS WOODEN RAILS.
+   Only his visual size changes inside; the walking position and all actions
+   (planting, chicken water, egg collecting) remain exactly the same.
+   Farmer is still visibly larger than either chicken. */
+.l2-farmer-in-pen {
+  width: clamp(76px, 6.1vw, 96px);
+  height: clamp(96px, 12vh, 110px);
+  transform: translate(-50%, -45%);
+  z-index: 20;
+}
+
+/* The pen is behind the farmer; upper and lower wooden rails cannot
+   cover his legs. Keep the egg and water controls interactive. */
+.l2-chicken-pen { z-index: 7; }
+.l2-pen-fence-back { z-index: 1; }
+.l2-pen-fence-front { z-index: 13; }
+
+@media (max-width: 650px) {
+  .l2-farmer-in-pen {
+    width: 56px;
+    height: 76px;
+    transform: translate(-50%, -45%);
+  }
+}

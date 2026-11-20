@@ -1,264 +1,137 @@
-
 import { useEffect, useRef, useState } from "react";
-
 import LevelChoose from "./LevelChoose";
 import LevelRules from "./LevelRules";
+import Level2Rules from "./Level2Rules";
 import FarmGame from "./FarmGame";
-
+import Level2Game from "./Level2Game";
 import "./StartPage.css";
 
-// BACKGROUND MUSIC NOTES
+// Original little farm background tune (music is optional).
 const MELODY = [
-  392, 440, 523.25, 659.25,
-  523.25, 440, 392, 329.63,
-  349.23, 392, 440, 523.25,
-  440, 392, 349.23, 329.63,
+  392, 440, 523.25, 659.25, 523.25, 440, 392, 329.63,
+  349.23, 392, 440, 523.25, 440, 392, 349.23, 329.63,
 ];
 
 export default function StartPage() {
-  // PAGE CONTROL
-  const [screen, setScreen] = useState("start");
-
-  // MUSIC CONTROL
+  const [page, setPage] = useState("start");
   const [musicOn, setMusicOn] = useState(false);
-
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // STOP BACKGROUND MUSIC
   function stopMusic() {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-
     if (audioRef.current) {
-      const audio = audioRef.current;
+      audioRef.current.close().catch(() => {});
       audioRef.current = null;
-
-      audio.close().catch(() => {});
     }
-
     setMusicOn(false);
   }
 
-  // PLAY A MUSIC NOTE
-  function playNote(audio, frequency) {
-    if (audio.state !== "running") return;
-
-    const oscillator = audio.createOscillator();
-    const gain = audio.createGain();
-
-    const time = audio.currentTime;
-
+  function playNote(context, frequency) {
+    if (context.state === "closed") return;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const t = context.currentTime;
     oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(
-      frequency,
-      time
-    );
-
-    gain.gain.setValueAtTime(
-      0.0001,
-      time
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-      0.04,
-      time + 0.04
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-      0.0001,
-      time + 0.35
-    );
-
+    oscillator.frequency.setValueAtTime(frequency, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.045, t + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
     oscillator.connect(gain);
-    gain.connect(audio.destination);
-
-    oscillator.start(time);
-    oscillator.stop(time + 0.36);
+    gain.connect(context.destination);
+    oscillator.start(t);
+    oscillator.stop(t + 0.36);
   }
 
-  // MUSIC ON / OFF
   async function toggleMusic() {
-    if (audioRef.current) {
-      stopMusic();
-      return;
-    }
-
-    const AudioClass =
-      window.AudioContext ||
-      window.webkitAudioContext;
-
-    if (!AudioClass) {
-      alert("Your browser does not support audio.");
-      return;
-    }
-
-    const audio = new AudioClass();
+    if (musicOn) { stopMusic(); return; }
+    const Engine = window.AudioContext || window.webkitAudioContext;
+    if (!Engine) return;
+    const audio = new Engine();
     audioRef.current = audio;
-
     try {
       await audio.resume();
-
-      if (audioRef.current !== audio) return;
-
       let noteIndex = 0;
-
-      function playNextNote() {
+      function nextNote() {
         if (audio.state !== "running") return;
-
-        const frequency =
-          MELODY[noteIndex % MELODY.length];
-
-        playNote(audio, frequency);
+        playNote(audio, MELODY[noteIndex % MELODY.length]);
         noteIndex++;
       }
-
-      playNextNote();
-
-      intervalRef.current = setInterval(
-        playNextNote,
-        410
-      );
-
+      nextNote();
+      intervalRef.current = setInterval(nextNote, 410);
       setMusicOn(true);
-    } catch (error) {
-      console.error("Music error:", error);
-      stopMusic();
+    } catch { stopMusic(); }
+  }
+
+  useEffect(() => () => {
+    if (intervalRef.current !== null) clearInterval(intervalRef.current);
+    if (audioRef.current) audioRef.current.close().catch(() => {});
+  }, []);
+
+  const goToStart = () => setPage("start");
+  const goToLevels = () => setPage("levels");
+  const playLevelOne = () => setPage("rules1");
+  const startLevelOne = () => setPage("game1");
+  const startLevelTwo = () => setPage("game2");
+
+  function playSelectedLevel(level) {
+    if (level === 1) { playLevelOne(); return; }
+    if (level === 2) {
+      let unlocked = 1;
+      try {
+        unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1);
+      } catch { /* browser without storage */ }
+      if (unlocked >= 2) setPage("rules2"); // RULES FIRST, no automatic countdown.
     }
   }
 
-  // CLEAN UP MUSIC
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
-
-      if (audioRef.current) {
-        audioRef.current.close().catch(() => {});
-      }
-    };
-  }, []);
-
-  // START GAME -> LEVEL SELECTION
-  function goToLevels() {
-    setScreen("levels");
-  }
-
-  // LEVEL 1 PLAY -> RULES
-  function playLevelOne() {
-    setScreen("rules");
-  }
-
-  // RULES FINISH -> LEVEL 1 GAME
-  function startLevelOneGame() {
-    stopMusic();
-    setScreen("game");
-  }
-
-  // BACK TO START PAGE
-  function goToStart() {
-    setScreen("start");
-  }
-
-  // ================================
-  // LEVEL SELECTION SCREEN
-  // ================================
-  if (screen === "levels") {
+  if (page === "levels") {
     return (
       <LevelChoose
         onBack={goToStart}
         onPlay={playLevelOne}
+        onPlayLevel={playSelectedLevel}
         musicOn={musicOn}
         onToggleMusic={toggleMusic}
       />
     );
   }
 
-  // ================================
-  // LEVEL 1 RULES - 10 SECONDS
-  // ================================
-  if (screen === "rules") {
-    return (
-      <LevelRules
-        onBack={goToLevels}
-        onFinish={startLevelOneGame}
-      />
-    );
+  if (page === "rules1") {
+    return <LevelRules onBack={goToLevels} onFinish={startLevelOne} />;
   }
 
-  // ================================
-  // FULL SCREEN LEVEL 1 GAME
-  // NO BACK BUTTON
-  // ================================
-  if (screen === "game") {
-    return <FarmGame />;
+  if (page === "rules2") {
+    return <Level2Rules onBack={goToLevels} onFinish={startLevelTwo} />;
   }
 
-  // ================================
-  // MAIN STARTING PAGE
-  // ================================
+  if (page === "game1") {
+    return <FarmGame onNextLevel={goToLevels} />;
+  }
+
+  if (page === "game2") {
+    // Level 2 intentionally has no Back button during gameplay.
+    return <Level2Game onNextLevel={goToLevels} />;
+  }
+
   return (
     <main className="farm-start-page">
-
-      {/* BACKGROUND OVERLAY */}
-      <div className="farm-start-shade" />
-
-      {/* TOP NAVIGATION */}
+      <div className="farm-start-shade" aria-hidden="true" />
       <header className="farm-start-topbar">
-
-        {/* GAME NAME */}
-        <span className="farm-start-brand">
-          🌾 LITTLE FARM ADVENTURE
-        </span>
-
-        {/* MUSIC BUTTON */}
-        <button
-          type="button"
-          className="farm-music-button"
-          onClick={toggleMusic}
-          aria-pressed={musicOn}
-        >
-          {musicOn
-            ? "🔊 Music ON"
-            : "🔇 Music OFF"}
+        <span className="farm-start-brand">🌾 LITTLE FARM ADVENTURE</span>
+        <button className="farm-music-button" type="button" onClick={toggleMusic} aria-pressed={musicOn}>
+          {musicOn ? "🔊 Music ON" : "🔇 Music OFF"}
         </button>
-
       </header>
-
-      {/* MAIN CONTENT */}
       <section className="farm-start-center">
-
-        {/* WELCOME TEXT */}
-        <div className="farm-start-kicker">
-          🌻 Welcome to your little farm 🌻
-        </div>
-
-        {/* GAME TITLE */}
-        <h1 className="farm-start-title">
-          Little Farm
-          <span>Adventure</span>
-        </h1>
-
-        {/* SUBTITLE */}
-        <p className="farm-start-subtitle">
-          Grow your crops. Care for your farm.
-          Begin your adventure!
-        </p>
-
-        {/* START GAME BUTTON */}
-        <button
-          type="button"
-          className="farm-play-button"
-          onClick={goToLevels}
-        >
-          ▶ START GAME
-        </button>
-
+        <div className="farm-start-kicker">🌻 Welcome to your little farm 🌻</div>
+        <h1 className="farm-start-title">Little Farm <span>Adventure</span></h1>
+        <p className="farm-start-subtitle">Grow your crops. Care for your animals. Build your dream farm!</p>
+        <button className="farm-play-button" type="button" onClick={goToLevels}>▶ START GAME</button>
       </section>
-
     </main>
   );
 }
