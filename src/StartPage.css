@@ -1,0 +1,326 @@
+
+/* =====================================
+   LITTLE FARM ADVENTURE - START PAGE
+===================================== */
+
+.farm-start-page,
+.farm-start-page * {
+  box-sizing: border-box;
+}
+
+.farm-start-page {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  color: white;
+
+  /* Cornfield Background */
+  background-color: #6dbb70;
+  background-image: url("/farm-cover.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* Background Overlay */
+.farm-start-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 40, 20, 0.12) 0%,
+    rgba(0, 45, 22, 0.18) 45%,
+    rgba(0, 35, 15, 0.45) 100%
+  );
+}
+
+/* Top Navigation */
+.farm-start-topbar {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  padding: 25px 5%;
+}
+
+.farm-start-brand {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+
+  text-shadow: 2px 3px 6px #174c28;
+}
+
+/* Music ON / OFF Button */
+.farm-music-button {
+  padding: 12px 22px;
+
+  background: rgba(21, 79, 38, 0.8);
+  color: white;
+
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 30px;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.farm-music-button:hover {
+  background: #2f8b45;
+  transform: scale(1.05);
+}
+
+.farm-music-button:active {
+  transform: scale(0.97);
+}
+
+/* Main Starting Screen */
+.farm-start-center {
+  position: relative;
+  z-index: 2;
+
+  flex: 1;
+  width: min(95%, 850px);
+
+  margin: auto;
+  padding: 50px 15px 90px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+}
+
+/* Welcome Text */
+.farm-start-kicker {
+  display: inline-block;
+
+  padding: 12px 24px;
+  border-radius: 30px;
+
+  background: rgba(23, 83, 43, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* Game Title */
+.farm-start-title {
+  margin: 30px 0 15px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(52px, 8vw, 110px);
+  font-weight: 900;
+  line-height: 1.05;
+
+  color: #ffffff;
+  letter-spacing: -2px;
+
+  text-shadow:
+    3px 4px 0 #245b28,
+    5px 7px 14px rgba(0, 0, 0, 0.45);
+}
+
+.farm-start-title span {
+  display: block;
+
+  color: #ffe082;
+
+  text-shadow:
+    3px 4px 0 #92652b,
+    5px 8px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Subtitle */
+.farm-start-subtitle {
+  max-width: 600px;
+  margin: 25px auto 35px;
+
+  color: #ffffff;
+  font-size: clamp(16px, 2vw, 21px);
+  font-weight: 700;
+  line-height: 1.6;
+
+  text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* START GAME Button */
+.farm-play-button {
+  min-width: 260px;
+  padding: 18px 40px;
+
+  background: linear-gradient(
+    180deg,
+    #ffe784 0%,
+    #ffcf4e 100%
+  );
+
+  color: #533914;
+
+  border: 3px solid #fff0b7;
+  border-radius: 20px;
+
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 0 #b77c1f,
+    0 12px 25px rgba(0, 0, 0, 0.35);
+
+  transition: all 0.2s ease;
+  animation: farm-button-glow 2.5s infinite;
+}
+
+.farm-play-button:hover {
+  transform: translateY(-4px) scale(1.04);
+
+  background: linear-gradient(
+    180deg,
+    #fff4ac,
+    #ffd75e
+  );
+}
+
+.farm-play-button:active {
+  transform: translateY(5px);
+
+  box-shadow:
+    0 2px 0 #b77c1f,
+    0 5px 12px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes farm-button-glow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.08);
+  }
+}
+
+/* Next Page Placeholder */
+.farm-next-page {
+  animation: farm-page-appear 0.5s ease;
+}
+
+.farm-smaller {
+  font-size: clamp(42px, 7vw, 80px);
+}
+
+@keyframes farm-page-appear {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tablet Responsive */
+@media (max-width: 768px) {
+  .farm-start-topbar {
+    padding: 18px 20px;
+  }
+
+  .farm-start-brand {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  .farm-music-button {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .farm-start-center {
+    padding: 50px 15px 75px;
+  }
+
+  .farm-start-kicker {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .farm-start-title {
+    font-size: clamp(50px, 10vw, 76px);
+  }
+
+  .farm-start-subtitle {
+    font-size: 16px;
+  }
+
+  .farm-play-button {
+    min-width: 220px;
+    font-size: 17px;
+    padding: 16px 25px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .farm-start-brand {
+    max-width: 160px;
+    line-height: 1.4;
+  }
+
+  .farm-start-title {
+    font-size: 49px;
+    letter-spacing: -1px;
+  }
+
+  .farm-start-subtitle {
+    font-size: 15px;
+    margin: 22px auto 30px;
+  }
+
+  .farm-start-page {
+    background-position: center center;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .farm-play-button {
+    animation: none;
+  }
+
+  .farm-play-button,
+  .farm-music-button {
+    transition: none;
+  }
+}

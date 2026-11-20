@@ -1,0 +1,177 @@
+
+.rules-page,
+.rules-page * {
+  box-sizing: border-box;
+}
+
+.rules-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  isolation: isolate;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 75px 20px 30px;
+
+  font-family: "Trebuchet MS", sans-serif;
+
+  background-image: url("/level.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.rules-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background: rgba(15, 55, 25, 0.52);
+}
+
+.rules-back {
+  position: absolute;
+  top: 25px;
+  left: 30px;
+
+  padding: 12px 23px;
+  border: 2px solid white;
+  border-radius: 30px;
+
+  background: #286a3d;
+  color: white;
+
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.rules-card {
+  width: min(100%, 650px);
+  padding: 30px;
+
+  border-radius: 28px;
+  border: 4px solid #e3c77a;
+
+  background: #fff8e2;
+  color: #315a36;
+
+  text-align: center;
+
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+}
+
+.rules-badge {
+  display: inline-block;
+
+  padding: 10px 20px;
+  border-radius: 30px;
+
+  background: #e1efd1;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rules-card h1 {
+  margin: 20px 0 5px;
+  font-family: Georgia, serif;
+  font-size: clamp(30px, 5vw, 43px);
+}
+
+.rules-farmer {
+  font-size: 65px;
+  margin: 10px 0;
+}
+
+.rules-dialogue {
+  padding: 15px 18px;
+  border: 2px solid #f1d999;
+  border-radius: 16px;
+
+  background: white;
+
+  line-height: 1.6;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rules-list {
+  margin-top: 20px;
+  display: grid;
+  gap: 9px;
+  text-align: left;
+}
+
+.rules-list div {
+  padding: 11px 15px;
+  border-radius: 12px;
+
+  background: #eaf5df;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rules-countdown {
+  margin-top: 20px;
+}
+
+.rules-countdown p {
+  margin: 4px;
+  font-weight: bold;
+}
+
+.rules-countdown span {
+  display: block;
+  margin: 5px 0;
+
+  font-size: 55px;
+  font-weight: 900;
+  color: #e49a25;
+}
+
+.rules-progress {
+  width: 100%;
+  height: 11px;
+
+  margin-top: 16px;
+  overflow: hidden;
+
+  border-radius: 20px;
+  background: #dfdfcb;
+}
+
+.rules-progress-fill {
+  height: 100%;
+  border-radius: 20px;
+
+  background: #5aac61;
+  transition: width 0.3s linear;
+}
+
+.rules-wait {
+  font-size: 13px;
+  font-weight: bold;
+  color: #78936f;
+}
+
+@media (max-width: 600px) {
+  .rules-page {
+    padding: 80px 12px 20px;
+  }
+
+  .rules-card {
+    padding: 20px 15px;
+  }
+
+  .rules-list div {
+    font-size: 12px;
+  }
+
+  .rules-back {
+    left: 15px;
+    top: 15px;
+  }
+}
