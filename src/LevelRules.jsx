@@ -1,83 +1,120 @@
 
-import { useEffect, useRef, useState } from "react";
 import "./LevelRules.css";
 
-export default function LevelRules({ onFinish, onBack }) {
-  const [countdown, setCountdown] = useState(10);
-  const finishRef = useRef(onFinish);
+const RULES = [
+  {
+    icon: "⏰",
+    text: "Complete Level 1 within 60 seconds. The countdown starts when you press START GAME.",
+  },
+  {
+    icon: "🌱",
+    text: "Start with 5 free carrot seeds and 0 Coins. Click PLANT to use one seed. The farmer walks there automatically.",
+  },
+  {
+    icon: "🪣",
+    text: "5 seconds after planting, a water bucket appears. Click it within the next 5 seconds!",
+  },
+  {
+    icon: "🌿",
+    text: "After watering, wait 7 seconds for the carrot to grow, then click HARVEST.",
+  },
+  {
+    icon: "🥀",
+    text: "If a plant dies, click CLEAR to remove it for −2 Coins. The farmer says 'Oops!'",
+  },
+  {
+    icon: "🚚",
+    text: "Harvested carrots go into the delivery truck. It can hold up to 6 carrots.",
+  },
+  {
+    icon: "🥕",
+    text: "Press GO with even 1 carrot. The truck drives right to left, then you earn 30 Coins per delivered carrot.",
+  },
+  {
+    icon: "🛒",
+    text: "When your seeds reach 0, you cannot plant. Buy seeds manually at Farmer's Shop for 10 Coins each; there is no auto-buy.",
+  },
+  {
+    icon: "🎯",
+    text: "Harvest at least 5 carrots and earn at least 150 delivery Coins before time ends. You can earn more!",
+  },
+  {
+    icon: "⏸️",
+    text: "PAUSE freezes the timer, plant growth, farmer walking, and deliveries. RESTART starts a fresh round.",
+  },
+  {
+    icon: "🔔",
+    text: "During the last 10 seconds, the clock plays warning ticks.",
+  },
+  {
+    icon: "🏆",
+    text: "At 00:00, meeting both goals earns 50 bonus Coins and unlocks Level 2. Otherwise it's Game Over.",
+  },
+];
 
-  useEffect(() => {
-    finishRef.current = onFinish;
-  }, [onFinish]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((prev) => Math.max(0, prev - 1));
-    }, 1000);
-
-    const timeout = setTimeout(() => {
-      finishRef.current();
-    }, 10000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, []);
-
+export default function LevelRules({
+  onFinish,
+  onBack,
+}) {
   return (
-    <main className="rules-page">
-      <div className="rules-overlay" />
+    <main className="lr-screen">
+
+      <div className="lr-shade" />
 
       <button
-        className="rules-back"
         type="button"
+        className="lr-back"
         onClick={onBack}
       >
-        ← BACK
+        ← BACK TO LEVELS
       </button>
 
-      <section className="rules-card">
-        <div className="rules-badge">
+      <section className="lr-card">
+
+        <div className="lr-kicker">
           🌱 LEVEL 1 — BEGINNER FARMER
         </div>
 
         <h1>📜 How to Play</h1>
 
-        <div className="rules-farmer">👩‍🌾</div>
-
-        <div className="rules-dialogue">
-          Hello, Farmer! Welcome to your first farming
-          adventure. Complete these missions to unlock
-          the next level!
-        </div>
-
-        <div className="rules-list">
-          <div>🌱 Plant 5 carrots in your farm.</div>
-          <div>💧 Water the seeds and wait for them to grow.</div>
-          <div>🥕 Harvest at least 5 carrots.</div>
-          <div>🪙 Earn 150 coins by harvesting crops.</div>
-          <div>🛒 Buy more seeds from the shop if needed.</div>
-        </div>
-
-        <div className="rules-countdown">
-          <p>🌻 Your adventure starts in</p>
-          <span>{countdown}</span>
-          <p>seconds</p>
-        </div>
-
-        <div className="rules-progress">
-          <div
-            className="rules-progress-fill"
-            style={{
-              width: `${(10 - countdown) * 10}%`,
-            }}
+        <div className="lr-intro">
+          <img
+            src="/farmer-character.png"
+            alt="Farmer"
           />
+
+          <p>
+            Hello, Farmer! Complete
+            these missions to unlock
+            the next level!
+          </p>
         </div>
 
-        <p className="rules-wait">
-          Get ready, little farmer! 🌾
-        </p>
+        <div className="lr-rules">
+          {RULES.map((rule, index) => (
+            <div
+              className="lr-rule"
+              key={index}
+            >
+              <span aria-hidden="true">
+                {rule.icon}
+              </span>
+
+              <p>{rule.text}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* NO RULES COUNTDOWN */}
+
+        <button
+          type="button"
+          className="lr-start"
+          onClick={onFinish}
+        >
+          ▶ START GAME
+        </button>
+
       </section>
     </main>
   );

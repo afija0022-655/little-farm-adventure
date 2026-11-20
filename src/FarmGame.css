@@ -1,0 +1,336 @@
+/* LITTLE FARM ADVENTURE — 60-SECOND LEVEL 1 */
+.fg-game, .fg-game * { box-sizing: border-box; }
+.fg-game {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; gap: 10px;
+  width: 100%; height: 100dvh; min-height: 0;
+  padding: 10px 18px 14px; margin: 0; overflow: hidden;
+  font-family: "Trebuchet MS", Arial, sans-serif; color: #345b3c;
+  background: linear-gradient(to bottom, #aceaf7 0%, #dbf3ec 46%, #aed987 46%, #80b968 100%);
+}
+/* HEADER: restart + pause / timer / inventory */
+.fg-header-actions { display: flex; align-items: center; gap: 9px; justify-self: start; }
+.fg-top-pause {
+  display: grid; place-items: center;
+  width: 50px; height: 50px; padding: 0;
+  border: 3px solid white; border-radius: 50%;
+  background: #deaa42; color: white;
+  font-size: 25px; line-height: 1;
+  box-shadow: 0 4px 0 #a37622; cursor: pointer;
+}
+.fg-top-pause:hover { background: #edbd59; }
+.fg-game.fg-paused .fg-truck-driving,
+.fg-game.fg-paused .fg-walking .fg-farmer-image,
+.fg-game.fg-paused .fg-mini-bucket,
+.fg-game.fg-paused .fg-spinner,
+.fg-game.fg-paused .fg-splash,
+.fg-game.fg-paused .fg-ready,
+.fg-game.fg-paused .fg-clock-urgent {
+  animation-play-state: paused !important;
+}
+.fg-pause-overlay {
+  position: fixed; inset: 0; z-index: 1100;
+  background: rgba(24, 66, 38, 0.68);
+  backdrop-filter: blur(3px);
+  display: grid; place-items: center; padding: 20px;
+}
+.fg-pause-card {
+  width: min(100%, 380px); padding: 24px;
+  border: 4px solid #f5d786; border-radius: 24px;
+  background: #fff9e7; color: #306640;
+  text-align: center; box-shadow: 0 20px 40px #10291855;
+}
+.fg-pause-icon { font-size: 50px; }
+.fg-pause-card h2 { margin: 4px 0 10px; font-size: 26px; }
+.fg-pause-card p { font-size: 14px; line-height: 1.5; }
+.fg-pause-card button {
+  margin-top: 10px; padding: 12px 22px; border: none;
+  border-radius: 12px; background: #3d9b55; color: white;
+  font-size: 15px; font-weight: 900; cursor: pointer;
+}
+.fg-game.fg-paused .fg-header { position: relative; z-index: 1200; }
+/* HEADER: restart / timer / inventory */
+.fg-header { flex: 0 0 auto; display: grid; grid-template-columns: 1fr minmax(220px, 345px) 1fr; align-items: center; gap: 10px; }
+.fg-top-restart {
+  justify-self: start; display: grid; place-items: center;
+  width: 50px; height: 50px; padding: 0; border: 3px solid white; border-radius: 50%;
+  background: #27844a; color: white; font-size: 37px; line-height: 1;
+  box-shadow: 0 4px 0 #185a32; cursor: pointer;
+}
+.fg-top-restart:hover { transform: rotate(-25deg); }
+.fg-clock {
+  width: 100%; min-width: 0; padding: 6px 14px 7px;
+  border: 3px solid #b9dc90; border-radius: 18px;
+  background: #fff9e5; text-align: center; box-shadow: 0 3px 0 #8eb768;
+}
+.fg-clock-main { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.fg-clock-label { font-size: 12px; font-weight: 900; color: #5c8244; white-space: nowrap; }
+.fg-clock-time { color: #246a3d; font-size: 28px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.fg-clock-track { margin-top: 4px; height: 6px; background: #e7e4cf; overflow: hidden; border-radius: 100px; }
+.fg-clock-track > div { height: 100%; background: #58ac57; transition: width .1s linear; }
+.fg-clock-hint { display: block; margin-top: 3px; color: #60805b; font-size: 10px; font-weight: 800; }
+.fg-clock-urgent { border-color: #e85757; background: #fff0e9; animation: fg-clock-pulse .5s ease-in-out infinite alternate; }
+.fg-clock-urgent .fg-clock-time, .fg-clock-urgent .fg-clock-hint { color: #c12626; }
+.fg-clock-urgent .fg-clock-track > div { background: #ea4646; }
+@keyframes fg-clock-pulse { to { box-shadow: 0 0 15px #e8575760; } }
+.fg-inventory { justify-self: end; display: flex; gap: 10px; }
+.fg-inventory-item {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 80px; padding: 5px 10px;
+  border: 3px solid #e9ce8a; border-radius: 17px;
+  background: #fff4d7; box-shadow: 0 3px 0 #c9aa68;
+}
+.fg-inventory-item > span { font-size: 19px; }
+.fg-inventory-item strong { color: #805725; font-size: 19px; line-height: 1.1; }
+.fg-inventory-item small { color: #8c703f; font-size: 10px; font-weight: 800; }
+/* FARM + SIDEBAR */
+.fg-layout { flex: 1; width: 100%; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 14px; }
+.fg-world {
+  min-width: 0; min-height: 0; height: 100%; padding: 10px;
+  display: flex; flex-direction: column;
+  background: #fff7dd; border: 4px solid #e7cd88; border-radius: 23px;
+}
+.fg-world-header { display: flex; justify-content: space-between; gap: 8px; margin: 0 6px 9px; color: #447947; font-size: 14px; font-weight: 900; }
+.fg-board {
+  flex: 1; position: relative; isolation: isolate; width: 100%; min-height: 0;
+  overflow: hidden; border: 7px solid #6c9e32; border-radius: 17px;
+  background: #80b900 url('/level1background.jpg') center / 450px 450px repeat;
+}
+.fg-barn { position: absolute; top: 1%; right: 2%; z-index: 2; width: 29%; height: 44%; object-fit: contain; pointer-events: none; user-select: none; }
+.fg-soil-cell { position: absolute; z-index: 3; width: 13.4%; height: 18.5%; transform: translate(-50%,-50%); }
+.fg-plot {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  width: 100%; height: 100%; padding: 4px;
+  border: 3px solid #95633c; border-radius: 14px;
+  background: #b78050; color: #fff9df; cursor: pointer;
+  box-shadow: inset 0 -5px 0 #814d3340,0 4px 0 #805431;
+  transition: transform .18s ease;
+}
+.fg-plot:hover:not(:disabled) { transform: translateY(-3px); }
+.fg-plot:disabled { opacity: 1; cursor: default; }
+.fg-empty { background: #b78050; }
+.fg-waiting { background: #a8784f; }
+.fg-thirsty { background: #9d714e; border-color: #eab953; }
+.fg-watering { background: #9b8057; }
+.fg-growing { background: #957a50; }
+.fg-ready { background: #c28d44; border-color: #ffe37c; animation: fg-ready-glow 1.2s infinite alternate; }
+.fg-dead { background: #756958; border-color: #5f5245; }
+.fg-crop { font-size: clamp(22px,2.6vw,40px); line-height: 1; }
+.fg-plot-label { font-size: clamp(8px,.8vw,12px); font-weight: 900; text-shadow: 0 2px 3px #634129; }
+.fg-dead-image { width: 55%; height: 61%; object-fit: contain; pointer-events: none; }
+@keyframes fg-ready-glow { from { box-shadow: 0 0 5px #ffe47b; } to { box-shadow: 0 0 18px #ffe47b; } }
+.fg-loading { width: 81%; height: 7px; border-radius: 99px; background: #e6dbc0; overflow: hidden; }
+.fg-loading > div { height: 100%; border-radius: inherit; background: linear-gradient(90deg,#54ac5d,#b8ef64); transition: width .1s linear; }
+.fg-waiting .fg-loading > div { background: linear-gradient(90deg,#e1b85b,#fadd8b); }
+.fg-remaining { font-size: 10px; line-height: 1; font-weight: 900; }
+.fg-spinner { width: 15px; height: 15px; border: 3px solid #d1ebfd; border-top-color: #218ed0; border-radius: 50%; animation: fg-spin .6s linear infinite; }
+@keyframes fg-spin { to { transform: rotate(360deg); } }
+.fg-mini-bucket {
+  position: absolute; z-index: 15; top: -13px; right: -12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 48px; height: 57px; padding: 2px; cursor: pointer;
+  border: 2px solid #48a6c3; border-radius: 12px;
+  background: #e5f9ff; box-shadow: 0 4px 8px #254c4d40;
+  animation: fg-bucket-pulse .6s infinite alternate;
+}
+.fg-mini-bucket img { width: 33px; height: 33px; object-fit: contain; }
+.fg-mini-bucket span { font-size: 12px; font-weight: 900; color: #17617e; }
+.fg-mini-bucket:disabled { opacity: .7; }
+@keyframes fg-bucket-pulse { to { transform: translateY(-4px); } }
+.fg-splash { position: absolute; z-index: 25; left: 50%; top: 20%; font-size: 34px; pointer-events: none; animation: fg-splash-up .85s ease-out forwards; }
+@keyframes fg-splash-up { from { opacity: 1; transform: translateY(0) scale(.7); } to { opacity: 0; transform: translateY(-45px) scale(1.5); } }
+/* FARMER */
+.fg-farmer {
+  position: absolute; z-index: 10; pointer-events: none;
+  width: clamp(52px,5.3vw,86px); height: clamp(66px,11vh,112px);
+  display: flex; align-items: center; justify-content: center;
+  transform: translate(-50%,-50%); transition: left .22s linear,top .22s linear;
+}
+.fg-farmer-image { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 3px #315d3760); }
+.fg-walking .fg-farmer-image { animation: fg-farmer-step .23s infinite alternate; }
+@keyframes fg-farmer-step { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-7px) rotate(2deg); } }
+.fg-speech {
+  position: absolute; bottom: 86%; left: 50%; z-index: 30;
+  transform: translateX(-50%); padding: 7px 10px;
+  background: white; color: #377344; border: 2px solid #d9d39f; border-radius: 14px;
+  font-size: 12px; font-weight: 900; white-space: nowrap;
+  box-shadow: 0 4px 12px #20382130;
+}
+.fg-speech::after { content: ""; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-bottom: 0; border-top-color: white; }
+/* DELIVERY TRUCK — bottom-right, GO at its front */
+.fg-truck {
+  position: absolute; z-index: 12; right: 2%; bottom: -8px; left: auto; top: auto;
+  width: min(24%,280px); display: flex; flex-direction: column; align-items: center;
+  pointer-events: none; transform: translateX(0);
+}
+.fg-truck-visual { position: relative; width: 100%; aspect-ratio: 1209 / 499; isolation: isolate; }
+.fg-truck-image { position: absolute; inset: 0; z-index: 2; display: block; width: 100%; height: 100%; object-fit: fill; }
+.fg-truck-cargo {
+  position: absolute; z-index: 1; left: 59%; top: 16%; width: 36%; height: 24%;
+  display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(2,1fr);
+  align-items: center; justify-items: center; pointer-events: none;
+}
+.fg-truck-cargo span { font-size: clamp(12px,1.2vw,20px); line-height: 1; transform: rotate(-25deg); }
+.fg-truck-count { position: relative; z-index: 5; margin-top: -3px; padding: 2px 9px; border-radius: 11px; background: #fef5d7; color: #704e1a; font-size: 12px; font-weight: 900; }
+.fg-go {
+  position: absolute; z-index: 20; left: -95px; top: 45%; right: auto; bottom: auto;
+  margin: 0; padding: 9px 17px; border: 2px solid white; border-radius: 13px;
+  background: #49a251; color: white; font-size: 14px; font-weight: 900;
+  cursor: pointer; pointer-events: auto; box-shadow: 0 4px 0 #286c36;
+}
+.fg-go:hover:not(:disabled) { background: #328840; }
+.fg-go:disabled { opacity: .55; cursor: default; }
+.fg-truck-driving { animation: fg-drive-left 2.8s linear forwards; }
+@keyframes fg-drive-left { from { transform: translateX(0); } to { transform: translateX(-150vw); } }
+/* STATUS AND SHOP */
+.fg-message {
+  flex-shrink: 0; min-height: 42px; margin-top: 8px; padding: 9px 13px;
+  display: flex; align-items: center;
+  background: #e7f4dc; color: #397443; border: 2px solid #b5d7a4; border-radius: 13px;
+  font-size: 13px; font-weight: 800;
+}
+.fg-sidebar { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.fg-panel { padding: 17px; background: #fff9ee; border: 3px solid #e5d19b; border-radius: 21px; box-shadow: 0 5px 15px #365d3920; }
+.fg-panel h2 { margin: 0 0 16px; color: #437a4b; font-size: 19px; }
+.fg-mission { margin-bottom: 16px; }
+.fg-mission-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 7px; font-size: 12px; font-weight: 800; }
+.fg-mission-row strong { white-space: nowrap; color: #348e4b; }
+.fg-progress { height: 9px; background: #e2e7d9; border-radius: 20px; overflow: hidden; }
+.fg-progress > div { height: 100%; background: linear-gradient(90deg,#86cb65,#409e56); border-radius: inherit; }
+.fg-reward { padding: 10px; background: #ffefbd; border-radius: 12px; color: #966d28; font-size: 12px; font-weight: 900; text-align: center; }
+.fg-goal-help { margin: 10px 1px 0; font-size: 11px; line-height: 1.45; color: #6a8367; }
+.fg-shop { background: #fff6e4; }
+.fg-shop-item { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.fg-shop-item > span { font-size: 34px; }
+.fg-shop-item > div { display: flex; flex-direction: column; gap: 4px; }
+.fg-shop-item strong { font-size: 14px; }
+.fg-shop-item small { color: #897148; font-size: 12px; }
+.fg-buy { width: 100%; padding: 11px; background: #edb64d; color: #60451e; border: none; border-radius: 12px; font-size: 14px; font-weight: 900; cursor: pointer; }
+.fg-buy:disabled { opacity: .55; cursor: default; }
+/* WIN / LOSE */
+.fg-win-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 20px; background: #163b2dcc; backdrop-filter: blur(5px); }
+.fg-win-card { width: min(100%,460px); padding: 25px; background: #fff8e5; border: 5px solid #f6d47d; border-radius: 27px; text-align: center; box-shadow: 0 18px 40px #173c2870; }
+.fg-trophy { font-size: 62px; }
+.fg-win-card h2 { margin: 8px 0 10px; color: #378449; font-family: Georgia,serif; font-size: 29px; }
+.fg-win-card > p { font-size: 14px; line-height: 1.5; }
+.fg-result-list { margin: 12px 0; padding: 9px; border-radius: 12px; background: #f3eedb; text-align: left; }
+.fg-result-list p { margin: 6px 0; font-size: 14px; }
+.fg-win-reward { margin: 14px 0; padding: 13px; background: #ffe8ae; color: #a07623; border-radius: 13px; font-size: 19px; font-weight: 900; }
+.fg-lose-note { color: #ae4444; font-weight: 800; }
+.fg-win-button { margin-top: 10px; padding: 12px 25px; color: white; background: #4ca260; border: none; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; }
+/* SHORT LAPTOP */
+@media (max-height: 700px) {
+  .fg-game { padding: 6px 10px; gap: 6px; }
+  .fg-top-restart { width: 41px; height: 41px; font-size: 29px; }
+  .fg-top-pause { width: 41px; height: 41px; font-size: 21px; }
+  .fg-clock { padding: 3px 10px 4px; }
+  .fg-clock-time { font-size: 23px; }
+  .fg-clock-hint { font-size: 9px; }
+  .fg-inventory-item { min-width: 70px; padding: 2px 7px; }
+  .fg-panel { padding: 9px; }
+  .fg-panel h2 { font-size: 16px; margin-bottom: 8px; }
+  .fg-mission { margin-bottom: 8px; }
+  .fg-world { padding: 7px; }
+}
+@media (max-width: 950px) {
+  .fg-layout { grid-template-columns: minmax(0,1fr) 240px; gap: 9px; }
+  .fg-header { grid-template-columns: auto minmax(170px,1fr) auto; }
+}
+/* MOBILE */
+@media (max-width: 700px) {
+  .fg-game { padding: 6px; gap: 6px; }
+  .fg-header { grid-template-columns: auto minmax(0,1fr) auto; gap: 5px; }
+  .fg-top-restart { width: 37px; height: 37px; font-size: 25px; }
+  .fg-top-pause { width: 37px; height: 37px; font-size: 19px; }
+  .fg-header-actions { gap: 4px; }
+  .fg-clock { padding: 3px 5px; border-width: 2px; border-radius: 10px; }
+  .fg-clock-main { gap: 4px; }
+  .fg-clock-label { font-size: 8px; }
+  .fg-clock-time { font-size: 17px; }
+  .fg-clock-hint { font-size: 7px; }
+  .fg-clock-track { height: 4px; }
+  .fg-inventory { gap: 3px; }
+  .fg-inventory-item { min-width: 42px; padding: 2px 4px; border-width: 2px; border-radius: 8px; }
+  .fg-inventory-item > span { font-size: 13px; }
+  .fg-inventory-item strong { font-size: 13px; }
+  .fg-inventory-item small { font-size: 8px; }
+  .fg-layout { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr) auto; gap: 6px; }
+  .fg-world { padding: 5px; border-width: 2px; }
+  .fg-world-header { font-size: 10px; margin-bottom: 4px; }
+  .fg-board { border-width: 3px; background-size: 350px 350px; }
+  .fg-plot { padding: 1px; gap: 1px; border-width: 2px; border-radius: 7px; }
+  .fg-crop { font-size: 17px; }
+  .fg-plot-label { font-size: 7px; }
+  .fg-loading { height: 4px; }
+  .fg-remaining { font-size: 7px; }
+  .fg-mini-bucket { width: 29px; height: 37px; top: -6px; right: -6px; }
+  .fg-mini-bucket img { width: 22px; height: 22px; }
+  .fg-mini-bucket span { font-size: 8px; }
+  .fg-farmer { width: 42px; height: 54px; }
+  .fg-truck { width: min(28%,220px); right: 1%; bottom: -4px; }
+  .fg-go { left: -70px; top: 40%; padding: 5px 10px; font-size: 11px; }
+  .fg-message { padding: 4px; min-height: 29px; font-size: 9px; }
+  .fg-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .fg-panel { padding: 6px; border-width: 2px; }
+  .fg-panel h2 { font-size: 11px; margin-bottom: 5px; }
+  .fg-mission { margin-bottom: 5px; }
+  .fg-mission-row { font-size: 9px; }
+  .fg-progress { height: 5px; }
+  .fg-reward { padding: 4px; font-size: 8px; }
+  .fg-goal-help { display: none; }
+  .fg-shop-item { gap: 4px; margin-bottom: 5px; }
+  .fg-shop-item > span { font-size: 20px; }
+  .fg-shop-item strong, .fg-shop-item small { font-size: 9px; }
+  .fg-buy { padding: 6px; font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fg-game * { transition-duration: 0.01ms !important; }
+  .fg-clock-urgent { animation: none; }
+}
+
+/* Result: total coins earned vs available wallet balance */
+.fg-total-coins {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin: 12px 0 6px;
+  padding: 12px;
+  border: 2px solid #95cb81;
+  border-radius: 14px;
+  background: #e4f5d9;
+  color: #286f3d;
+  font-weight: 900;
+}
+.fg-total-coins strong { font-size: 25px; font-variant-numeric: tabular-nums; }
+.fg-wallet-balance { margin: 8px 0; color: #6a765b; font-size: 12px !important; }
+
+/* Keep GO and cargo count in front of the truck, fully visible */
+.fg-truck-count {
+  position: absolute;
+  left: -95px;
+  top: calc(45% - 31px);
+  bottom: auto;
+  margin: 0;
+  transform: none;
+  padding: 3px 12px;
+  white-space: nowrap;
+  z-index: 20;
+}
+@media (max-width: 700px) {
+  .fg-truck-count { left: -70px; top: calc(40% - 27px); }
+}
+
+/* RESULT BUTTONS: NEXT LEVEL + PLAY AGAIN */
+.fg-result-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.fg-next-level-button {
+  background: #e2a435;
+  color: #fff;
+}
+.fg-next-level-button:hover { background: #c88919; }

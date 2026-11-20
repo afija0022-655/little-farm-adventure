@@ -1,10 +1,13 @@
 
 import { useEffect, useRef, useState } from "react";
+
 import LevelChoose from "./LevelChoose";
 import LevelRules from "./LevelRules";
 import FarmGame from "./FarmGame";
+
 import "./StartPage.css";
 
+// BACKGROUND MUSIC NOTES
 const MELODY = [
   392, 440, 523.25, 659.25,
   523.25, 440, 392, 329.63,
@@ -13,16 +16,16 @@ const MELODY = [
 ];
 
 export default function StartPage() {
-  // Page navigation
+  // PAGE CONTROL
   const [screen, setScreen] = useState("start");
 
-  // Music state
+  // MUSIC CONTROL
   const [musicOn, setMusicOn] = useState(false);
 
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // Stop background music
+  // STOP BACKGROUND MUSIC
   function stopMusic() {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
@@ -32,24 +35,32 @@ export default function StartPage() {
     if (audioRef.current) {
       const audio = audioRef.current;
       audioRef.current = null;
+
       audio.close().catch(() => {});
     }
 
     setMusicOn(false);
   }
 
-  // Play music notes
+  // PLAY A MUSIC NOTE
   function playNote(audio, frequency) {
     if (audio.state !== "running") return;
 
     const oscillator = audio.createOscillator();
     const gain = audio.createGain();
+
     const time = audio.currentTime;
 
     oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(frequency, time);
+    oscillator.frequency.setValueAtTime(
+      frequency,
+      time
+    );
 
-    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.setValueAtTime(
+      0.0001,
+      time
+    );
 
     gain.gain.exponentialRampToValueAtTime(
       0.04,
@@ -68,7 +79,7 @@ export default function StartPage() {
     oscillator.stop(time + 0.36);
   }
 
-  // Music ON / OFF
+  // MUSIC ON / OFF
   async function toggleMusic() {
     if (audioRef.current) {
       stopMusic();
@@ -76,7 +87,8 @@ export default function StartPage() {
     }
 
     const AudioClass =
-      window.AudioContext || window.webkitAudioContext;
+      window.AudioContext ||
+      window.webkitAudioContext;
 
     if (!AudioClass) {
       alert("Your browser does not support audio.");
@@ -93,7 +105,7 @@ export default function StartPage() {
 
       let noteIndex = 0;
 
-      const playNextNote = () => {
+      function playNextNote() {
         if (audio.state !== "running") return;
 
         const frequency =
@@ -101,7 +113,7 @@ export default function StartPage() {
 
         playNote(audio, frequency);
         noteIndex++;
-      };
+      }
 
       playNextNote();
 
@@ -117,7 +129,7 @@ export default function StartPage() {
     }
   }
 
-  // Clean up music
+  // CLEAN UP MUSIC
   useEffect(() => {
     return () => {
       if (intervalRef.current !== null) {
@@ -130,28 +142,30 @@ export default function StartPage() {
     };
   }, []);
 
-  // START -> LEVEL CHOOSE
+  // START GAME -> LEVEL SELECTION
   function goToLevels() {
     setScreen("levels");
   }
 
-  // PLAY -> SHOW RULES
+  // LEVEL 1 PLAY -> RULES
   function playLevelOne() {
     setScreen("rules");
   }
 
-  // RULES FINISHED -> GAME
+  // RULES FINISH -> LEVEL 1 GAME
   function startLevelOneGame() {
     stopMusic();
     setScreen("game");
   }
 
-  // BACK TO START
+  // BACK TO START PAGE
   function goToStart() {
     setScreen("start");
   }
 
-  // LEVEL CHOOSE PAGE
+  // ================================
+  // LEVEL SELECTION SCREEN
+  // ================================
   if (screen === "levels") {
     return (
       <LevelChoose
@@ -163,7 +177,9 @@ export default function StartPage() {
     );
   }
 
-  // LEVEL 1 RULES PAGE - 10 SECONDS
+  // ================================
+  // LEVEL 1 RULES - 10 SECONDS
+  // ================================
   if (screen === "rules") {
     return (
       <LevelRules
@@ -173,49 +189,32 @@ export default function StartPage() {
     );
   }
 
-  // LEVEL 1 FARMING GAME
+  // ================================
+  // FULL SCREEN LEVEL 1 GAME
+  // NO BACK BUTTON
+  // ================================
   if (screen === "game") {
-    return (
-      <>
-        <button
-          type="button"
-          onClick={goToLevels}
-          style={{
-            position: "fixed",
-            top: "15px",
-            left: "15px",
-            zIndex: 1000,
-            padding: "12px 20px",
-            background: "#27683e",
-            color: "white",
-            border: "2px solid white",
-            borderRadius: "20px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          ← BACK TO LEVELS
-        </button>
-
-        <FarmGame />
-      </>
-    );
+    return <FarmGame />;
   }
 
-  // MAIN START PAGE
+  // ================================
+  // MAIN STARTING PAGE
+  // ================================
   return (
     <main className="farm-start-page">
 
-      {/* Background overlay */}
+      {/* BACKGROUND OVERLAY */}
       <div className="farm-start-shade" />
 
-      {/* Top navigation */}
+      {/* TOP NAVIGATION */}
       <header className="farm-start-topbar">
 
+        {/* GAME NAME */}
         <span className="farm-start-brand">
           🌾 LITTLE FARM ADVENTURE
         </span>
 
+        {/* MUSIC BUTTON */}
         <button
           type="button"
           className="farm-music-button"
@@ -229,23 +228,27 @@ export default function StartPage() {
 
       </header>
 
-      {/* Start screen */}
+      {/* MAIN CONTENT */}
       <section className="farm-start-center">
 
+        {/* WELCOME TEXT */}
         <div className="farm-start-kicker">
           🌻 Welcome to your little farm 🌻
         </div>
 
+        {/* GAME TITLE */}
         <h1 className="farm-start-title">
           Little Farm
           <span>Adventure</span>
         </h1>
 
+        {/* SUBTITLE */}
         <p className="farm-start-subtitle">
           Grow your crops. Care for your farm.
           Begin your adventure!
         </p>
 
+        {/* START GAME BUTTON */}
         <button
           type="button"
           className="farm-play-button"
@@ -255,6 +258,7 @@ export default function StartPage() {
         </button>
 
       </section>
+
     </main>
   );
 }

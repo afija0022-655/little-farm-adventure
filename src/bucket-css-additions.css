@@ -1,0 +1,74 @@
+/* Add these rules to the END of your existing FarmGame.css */
+.fg-soil-cell { overflow: visible; }
+
+.fg-bucket-button {
+  position: absolute;
+  z-index: 12;
+  top: -12px;
+  right: -10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1px;
+  width: 46px;
+  min-height: 51px;
+  padding: 3px;
+  border: 2px solid #a87c39;
+  border-radius: 12px;
+  background: #fff9dd;
+  cursor: pointer;
+  box-shadow: 0 3px 7px #583a2470;
+  animation: fg-bucket-pulse 0.5s infinite alternate;
+}
+
+.fg-bucket-button img {
+  display: block;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.fg-bucket-button:hover:not(:disabled) {
+  background: #e1f5fc;
+  transform: scale(1.1);
+}
+
+.fg-bucket-button:disabled { opacity: 0.65; cursor: default; }
+.fg-water-countdown { color: #b43f21; font: 900 11px/1 Arial, sans-serif; }
+
+.fg-watering { background: #96734d; border-color: #61add0; }
+
+.fg-dead {
+  background: #75634b;
+  border-color: #655348;
+  filter: saturate(0.65);
+}
+
+.fg-water-splash {
+  position: absolute;
+  z-index: 14;
+  top: -8px;
+  left: 23%;
+  pointer-events: none;
+  font-size: 36px;
+  animation: fg-water-splash 0.9s ease-out forwards;
+}
+
+@keyframes fg-bucket-pulse {
+  from { box-shadow: 0 0 2px #fcb843; }
+  to   { box-shadow: 0 0 12px #fcb843; }
+}
+
+@keyframes fg-water-splash {
+  from { opacity: 1; transform: translateY(-10px) scale(1.2); }
+  to   { opacity: 0; transform: translateY(18px) scale(0.9); }
+}
+
+@media (max-width: 600px) {
+  .fg-bucket-button { width: 33px; min-height: 36px; top: -8px; right: -7px; padding: 2px; border-radius: 7px; }
+  .fg-bucket-button img { width: 20px; height: 20px; }
+  .fg-water-countdown { font-size: 9px; }
+  .fg-water-splash { font-size: 24px; }
+}
