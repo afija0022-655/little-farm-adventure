@@ -704,4 +704,40 @@ body::before, body::after { content: none !important; }
   .fg-panel {
     flex-shrink: 0;
   }
+}/* iPhone Portrait Scrolling Fix */
+@media screen and (orientation: portrait) and (max-width: 900px) {
+  html,
+  body,
+  #root {
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+    position: static !important;
+  }
+
+  .fg-game {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    touch-action: pan-y;
+  }
+
+  .fg-layout,
+  .fg-world,
+  .fg-sidebar {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .fg-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    touch-action: pan-y !important;
+    padding-bottom: 35px;
+  }
 }
