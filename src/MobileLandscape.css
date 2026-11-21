@@ -678,46 +678,26 @@ body::before, body::after { content: none !important; }
     max-width: 100%;
   }
 }
-@media (orientation: portrait) and (pointer: coarse) {
-  html,
-  body,
-  #root {
-    height: auto !important;
-    min-height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto !important;
-  }
 
-  .fg-game {
-    height: auto !important;
-    min-height: 100dvh;
-    overflow: visible !important;
-  }
 
-  .fg-layout,
-  .fg-sidebar {
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  .fg-panel {
-    flex-shrink: 0;
-  }
-}/* iPhone Portrait Scrolling Fix */
+/* ================================================================
+   iPhone portrait page scrolling for Levels 1–5 (November 2026)
+   Keeps the existing music, farm rules, and desktop layout intact.
+   ================================================================ */
 @media screen and (orientation: portrait) and (max-width: 900px) {
-  html,
-  body,
-  #root {
-    height: auto !important;
-    min-height: 100%;
-    overflow-x: clip !important;
-    overflow-y: auto !important;
+  html, body, #root {
     position: static !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
 
-  .fg-game {
+  .fg-game, .l2-game, .l3-game, .l4-game, .l5-game {
     position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
     height: auto !important;
     min-height: 100dvh !important;
     max-height: none !important;
@@ -725,19 +705,29 @@ body::before, body::after { content: none !important; }
     touch-action: pan-y;
   }
 
-  .fg-layout,
-  .fg-world,
-  .fg-sidebar {
+  .fg-layout, .l2-layout, .l3-layout, .l4-layout, .l5-layout,
+  .fg-world, .l2-left, .l3-left, .l4-left, .l5-left,
+  .fg-sidebar, .l2-sidebar, .l3-sidebar, .l4-sidebar, .l5-sidebar {
     height: auto !important;
     max-height: none !important;
     min-height: 0 !important;
     overflow: visible !important;
   }
 
-  .fg-sidebar {
+  .fg-layout, .l2-layout, .l3-layout, .l4-layout, .l5-layout,
+  .fg-sidebar, .l2-sidebar, .l3-sidebar, .l4-sidebar, .l5-sidebar {
     display: flex !important;
     flex-direction: column !important;
+  }
+
+  .fg-sidebar, .l2-sidebar, .l3-sidebar, .l4-sidebar, .l5-sidebar {
+    flex: none !important;
+    width: 100% !important;
     touch-action: pan-y !important;
-    padding-bottom: 35px;
+    padding-bottom: max(35px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .fg-panel, .l2-panel, .l3-panel, .l4-panel, .l5-panel {
+    flex-shrink: 0 !important;
   }
 }
