@@ -99,6 +99,48 @@ function getInitialPage() {
 
 export default function StartPage() {
   const [page, setPage] = useState(getInitialPage);
+  const [manualLandscape, setManualLandscape] = useState(false);
+  const [browserHelp, setBrowserHelp] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const inAppBrowser = typeof navigator !== "undefined" &&
+    /FBAN|FBAV|FB_IAB|Messenger|Instagram/i.test(navigator.userAgent);
+  const [portraitPhone, setPortraitPhone] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(orientation: portrait) and (pointer: coarse)").matches
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia("(orientation: portrait) and (pointer: coarse)");
+    const update = () => {
+      setPortraitPhone(query.matches);
+      if (!query.matches) setManualLandscape(false);
+    };
+    update();
+    query.addEventListener?.("change", update);
+    return () => query.removeEventListener?.("change", update);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("farm-manual-landscape", manualLandscape && portraitPhone);
+    return () => document.body.classList.remove("farm-manual-landscape");
+  }, [manualLandscape, portraitPhone]);
+
+  function openInBrowser() {
+    // In-app browsers control whether a link can leave their webview.
+    setBrowserHelp(true);
+    window.open("https://little-farm-adventure.vercel.app/", "_blank", "noopener,noreferrer");
+  }
+
+  async function copyGameLink() {
+    const link = "https://little-farm-adventure.vercel.app/";
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+    } catch {
+      setLinkCopied(false);
+      // Show selectable link if clipboard permission is unavailable.
+    }
+    setBrowserHelp(true);
+  }
 
   useEffect(() => {
     // Let the landing page render first; gently prepare Level 1 images afterward.
@@ -182,6 +224,7 @@ export default function StartPage() {
   }, []);
 
   const goToStart = () => {
+    setManualLandscape(false);
     try { window.sessionStorage.setItem(LAST_PAGE_KEY, "start"); } catch { /* storage unavailable */ }
     setPage("start");
   };
@@ -207,6 +250,7 @@ export default function StartPage() {
     }
   }
 
+  function renderPage() {
   if (page === "levels") {
     return (
       <LevelChoose
@@ -269,5 +313,34 @@ export default function StartPage() {
         <button className="farm-play-button" type="button" onClick={goToLevels}>▶ START GAME</button>
       </section>
     </main>
+  );
+  }
+
+  return (
+    <>
+      <div className={manualLandscape && portraitPhone ? "farm-rotate-shell farm-rotate-active" : "farm-rotate-shell"}>
+        {renderPage()}
+      </div>
+      {portraitPhone && page !== "start" && (
+        <div className="farm-view-actions">
+          <button className="farm-view-button" type="button" onClick={() => setManualLandscape(v => !v)} aria-pressed={manualLandscape}>
+            {manualLandscape ? "↩ Normal View" : "↻ Play Sideways"}
+          </button>
+          {inAppBrowser && <button className="farm-view-button" type="button" onClick={openInBrowser}>↗ Open in Browser</button>}
+        </div>
+      )}
+      {inAppBrowser && page === "start" && (
+        <button className="farm-browser-start-button" type="button" onClick={openInBrowser}>↗ Open in Browser</button>
+      )}
+      {browserHelp && inAppBrowser && (
+        <div className="farm-browser-help" role="dialog" aria-label="Open game in Safari or Chrome">
+          <button type="button" className="farm-browser-close" onClick={() => setBrowserHelp(false)} aria-label="Close">×</button>
+          <strong>Open in Safari or Chrome</strong>
+          <p>If the game still opens inside Facebook/Messenger, tap its ••• menu and choose “Open in external browser” if available, or copy this link and paste it into Safari/Chrome.</p>
+          <button type="button" onClick={copyGameLink}>{linkCopied ? "✓ Link Copied" : "Copy Game Link"}</button>
+          <input aria-label="Game URL" readOnly value="https://little-farm-adventure.vercel.app/" onFocus={e => e.target.select()} />
+        </div>
+      )}
+    </>
   );
 }
