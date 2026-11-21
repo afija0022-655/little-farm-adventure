@@ -678,3 +678,30 @@ body::before, body::after { content: none !important; }
     max-width: 100%;
   }
 }
+@media (orientation: portrait) and (pointer: coarse) {
+  html,
+  body,
+  #root {
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+  }
+
+  .fg-game {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: visible !important;
+  }
+
+  .fg-layout,
+  .fg-sidebar {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .fg-panel {
+    flex-shrink: 0;
+  }
+}
