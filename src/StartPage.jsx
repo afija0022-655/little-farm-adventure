@@ -13,27 +13,65 @@ import Level5Game from "./Level5Game";
 import "./StartPage.css";
 import "./MobileLandscape.css";
 
-// Preload commonly used game artwork after the first page renders.
-// Images are cached by the browser when possible. This does not alter game timers.
-const GAME_IMAGES = [
-  "/farm-cover.jpg",
-  "/level.jpg",
-  "/level1background.jpg",
-  "/farmer-character.png",
-  "/barn.png",
-  "/chicken.png",
-  "/cow.png",
-  "/rabbit.png",
-  "/delivery-car.png",
-  "/water-bucket.png",
-  "/dead-plant.png",
+// Prepare gameplay images BEFORE mounting a timed level.
+// Missing optional artwork must never trap the player on a loading screen.
+const COMMON_IMAGES = [
+  "/farmer-character.png", "/delivery-car.png", "/water-bucket.png", "/dead-plant.png",
 ];
+const LEVEL_IMAGES = {
+  1: ["/barn.png"],
+  2: ["/chicken.png"],
+  3: ["/chicken.png", "/cow.png", "/rabbit.png"],
+  4: ["/chicken.png", "/cow.png", "/rabbit.png"],
+  5: ["/chicken.png", "/cow.png", "/rabbit.png"],
+};
+const imagePromises = new Map();
+function loadImage(src) {
+  if (!imagePromises.has(src)) {
+    imagePromises.set(src, new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = src;
+      if (img.complete) resolve(img.naturalWidth > 0);
+    }));
+  }
+  return imagePromises.get(src);
+}
+function preloadLevel(level) {
+  return Promise.all([...COMMON_IMAGES, ...(LEVEL_IMAGES[level] || [])].map(loadImage));
+}
 
-function preloadGameImages() {
-  GAME_IMAGES.forEach((src) => {
-    const img = new Image();
-    img.src = src;
-  });
+// The game component mounts AFTER artwork loading; that is when its clock starts.
+function GameAssetsGate({ level, children }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let active = true;
+    const timeout = setTimeout(() => { if (active) setReady(true); }, 12000);
+    preloadLevel(level).then(() => { if (active) setReady(true); });
+    return () => { active = false; clearTimeout(timeout); };
+  }, [level]);
+  if (!ready) {
+    return (
+      <main className="farm-assets-loading" role="status" aria-live="polite">
+        <div className="farm-assets-loading-card">
+          <div style={{ fontSize: 42 }}>🌱🚜</div>
+          <h2>Preparing your farm...</h2>
+          <p>Loading game pictures before the timer starts.</p>
+        </div>
+      </main>
+    );
+  }
+  return children;
+}
+
+// A browser may support orientation locking (mostly some Android/fullscreen browsers).
+// iOS Safari and Facebook/Messenger can reject it. Do not fake rotation or block play.
+function tryLandscape() {
+  try {
+    const promise = window.screen?.orientation?.lock?.("landscape");
+    promise?.catch?.(() => {});
+  } catch { /* unsupported: normal responsive layout remains usable */ }
 }
 
 // Original little farm background tune (music is optional).
@@ -63,7 +101,9 @@ export default function StartPage() {
   const [page, setPage] = useState(getInitialPage);
 
   useEffect(() => {
-    preloadGameImages();
+    // Let the landing page render first; gently prepare Level 1 images afterward.
+    const timer = setTimeout(() => { preloadLevel(1); }, 250);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -75,21 +115,30 @@ export default function StartPage() {
   }, [page]);
 
   const [musicOn, setMusicOn] = useState(false);
+  const [musicError, setMusicError] = useState("");
+  const musicOnRef = useRef(false);
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
+  const noteIndexRef = useRef(0);
 
-  function stopMusic() {
+  function clearMusicInterval() {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    if (audioRef.current) {
-      audioRef.current.close().catch(() => {});
-      audioRef.current = null;
-    }
-    setMusicOn(false);
   }
 
+  function stopMusic() {
+    musicOnRef.current = false;
+    clearMusicInterval();
+    const ctx = audioRef.current;
+    audioRef.current = null;
+    if (ctx) ctx.close().catch(() => {});
+    setMusicOn(false);
+    setMusicError("");
+  }
+
+  // Keep the original melody, instruments and rhythm unchanged.
   function playNote(context, frequency) {
     if (context.state === "closed") return;
     const oscillator = context.createOscillator();
@@ -106,36 +155,70 @@ export default function StartPage() {
     oscillator.stop(t + 0.36);
   }
 
-  async function toggleMusic() {
-    if (musicOn) { stopMusic(); return; }
-    const Engine = window.AudioContext || window.webkitAudioContext;
-    if (!Engine) return;
-    const audio = new Engine();
-    audioRef.current = audio;
-    try {
-      await audio.resume();
-      let noteIndex = 0;
-      function nextNote() {
-        if (audio.state !== "running") return;
-        playNote(audio, MELODY[noteIndex % MELODY.length]);
-        noteIndex++;
-      }
-      nextNote();
-      intervalRef.current = setInterval(nextNote, 410);
-      setMusicOn(true);
-    } catch { stopMusic(); }
+  function playNextNote() {
+    const ctx = audioRef.current;
+    if (!musicOnRef.current || !ctx || ctx.state !== "running") return;
+    playNote(ctx, MELODY[noteIndexRef.current % MELODY.length]);
+    noteIndexRef.current += 1;
   }
 
-  useEffect(() => () => {
-    if (intervalRef.current !== null) clearInterval(intervalRef.current);
-    if (audioRef.current) audioRef.current.close().catch(() => {});
+  function toggleMusic() {
+    if (musicOnRef.current) { stopMusic(); return; }
+    const Engine = window.AudioContext || window.webkitAudioContext;
+    if (!Engine) {
+      setMusicError("This browser does not support game music.");
+      return;
+    }
+    try {
+      // Create, resume and schedule the first oscillator within THIS tap.
+      // Do not await resume() before scheduling: that may fail on iOS WebKit.
+      const ctx = new Engine();
+      audioRef.current = ctx;
+      musicOnRef.current = true;
+      noteIndexRef.current = 0;
+      setMusicError("");
+      if (ctx.state !== "running") ctx.resume().catch(() => {});
+      playNote(ctx, MELODY[noteIndexRef.current++]);
+      clearMusicInterval();
+      intervalRef.current = setInterval(() => {
+        if (ctx.state === "interrupted" || ctx.state === "suspended") {
+          ctx.resume().catch(() => {});
+        }
+        playNextNote();
+      }, 410);
+      setMusicOn(true);
+    } catch {
+      stopMusic();
+      setMusicError("Music could not start. Tap Music ON again.");
+    }
+  }
+
+  useEffect(() => {
+    function handleReturn() {
+      const ctx = audioRef.current;
+      if (document.visibilityState === "visible" && musicOnRef.current && ctx && ctx.state !== "running") {
+        ctx.resume().catch(() => {});
+      }
+    }
+    document.addEventListener("visibilitychange", handleReturn);
+    window.addEventListener("pageshow", handleReturn);
+    return () => {
+      document.removeEventListener("visibilitychange", handleReturn);
+      window.removeEventListener("pageshow", handleReturn);
+      clearMusicInterval();
+      if (audioRef.current) audioRef.current.close().catch(() => {});
+    };
   }, []);
 
   const goToStart = () => {
     try { window.sessionStorage.setItem(LAST_PAGE_KEY, "start"); } catch { /* storage unavailable */ }
     setPage("start");
   };
-  const goToLevels = () => setPage("levels");
+  const goToLevels = () => {
+    setPage("levels");
+    preloadLevel(1);
+    tryLandscape();
+  };
   const playLevelOne = () => setPage("rules1");
   const startLevelOne = () => setPage("game1");
   const startLevelTwo = () => setPage("game2");
@@ -182,20 +265,20 @@ export default function StartPage() {
   }
 
   if (page === "game1") {
-    return <FarmGame onNextLevel={goToLevels} onExit={goToStart} />;
+    return <GameAssetsGate level={1}><FarmGame onNextLevel={goToLevels} onExit={goToStart} /></GameAssetsGate>;
   }
   if (page === "game2") {
     // Level 2 intentionally has no Back button during gameplay.
-    return <Level2Game onNextLevel={goToLevels} onExit={goToStart} />;
+    return <GameAssetsGate level={2}><Level2Game onNextLevel={goToLevels} onExit={goToStart} /></GameAssetsGate>;
   }
   if (page === "game3") {
-    return <Level3Game onNextLevel={goToLevels} onExit={goToStart} />;
+    return <GameAssetsGate level={3}><Level3Game onNextLevel={goToLevels} onExit={goToStart} /></GameAssetsGate>;
   }
   if (page === "game4") {
-    return <Level4Game onNextLevel={goToLevels} onExit={goToStart} />;
+    return <GameAssetsGate level={4}><Level4Game onNextLevel={goToLevels} onExit={goToStart} /></GameAssetsGate>;
   }
   if (page === "game5") {
-    return <Level5Game onNextLevel={goToLevels} onExit={goToStart} />;
+    return <GameAssetsGate level={5}><Level5Game onNextLevel={goToLevels} onExit={goToStart} /></GameAssetsGate>;
   }
 
   return (
@@ -207,6 +290,7 @@ export default function StartPage() {
           {musicOn ? "🔊 Music ON" : "🔇 Music OFF"}
         </button>
       </header>
+      {musicError && <p className="farm-music-error" role="alert">{musicError}</p>}
       <section className="farm-start-center">
         <div className="farm-start-kicker">🌻 Welcome to your little farm 🌻</div>
         <h1 className="farm-start-title">Little Farm <span>Adventure</span></h1>

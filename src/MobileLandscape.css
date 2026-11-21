@@ -447,226 +447,42 @@
 }
 
 
-/* In-app browser fallback: rotate our GAME CONTENT, not the OS browser. */
-.farm-rotate-shell { width: 100%; min-height: 100%; }
-@media (orientation: portrait) and (pointer: coarse) {
-  body.farm-manual-landscape { margin: 0; overflow: hidden; }
-  body.farm-manual-landscape::after { display: none !important; }
-  .farm-rotate-shell.farm-rotate-active {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    width: 100dvh;
-    height: 100vw;
-    min-height: 0;
-    overflow: hidden;
-    transform-origin: top left;
-    transform: translateX(100vw) rotate(90deg);
-  }
-  .farm-rotate-active > main,
-  .farm-rotate-active .fg-game,
-  .farm-rotate-active .l2-game,
-  .farm-rotate-active .l3-game,
-  .farm-rotate-active .l4-game,
-  .farm-rotate-active .l5-game,
-  .farm-rotate-active .lc-screen,
-  .farm-rotate-active .lr-screen,
-  .farm-rotate-active .l2r-screen,
-  .farm-rotate-active .l3r-screen,
-  .farm-rotate-active .l4r-screen,
-  .farm-rotate-active .l5r-screen {
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    max-height: 100%;
-  }
-  .farm-rotate-active .fg-game,
-  .farm-rotate-active .l2-game,
-  .farm-rotate-active .l3-game,
-  .farm-rotate-active .l4-game,
-  .farm-rotate-active .l5-game {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    gap: 3px;
-    padding: 3px;
-  }
-  .farm-rotate-active .fg-layout,
-  .farm-rotate-active .l2-layout,
-  .farm-rotate-active .l3-layout,
-  .farm-rotate-active .l4-layout,
-  .farm-rotate-active .l5-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(145px, 22%, 200px);
-    grid-template-rows: minmax(0, 1fr);
-    flex: 1 1 0;
-    min-height: 0;
-    overflow: hidden;
-    gap: 5px;
-  }
-  .farm-rotate-active .fg-world,
-  .farm-rotate-active .l2-left,
-  .farm-rotate-active .l3-left,
-  .farm-rotate-active .l4-left,
-  .farm-rotate-active .l5-left { min-height: 0; overflow: hidden; }
-  .farm-rotate-active .fg-board,
-  .farm-rotate-active .l2-board,
-  .farm-rotate-active .l3-board,
-  .farm-rotate-active .l4-board,
-  .farm-rotate-active .l5-board { min-height: 0; flex: 1 1 0; }
-  .farm-rotate-active .fg-sidebar,
-  .farm-rotate-active .l2-sidebar,
-  .farm-rotate-active .l3-sidebar,
-  .farm-rotate-active .l4-sidebar,
-  .farm-rotate-active .l5-sidebar {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    height: 100%;
-    overflow-y: auto;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-  }
-  .farm-rotate-active .lc-level-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 7px;
-  }
-  .farm-rotate-active .lc-content {
-    max-width: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-    padding-bottom: 15px;
-  }
-  .farm-rotate-active .lc-level-card { min-height: 140px; padding: 7px; }
-  .farm-rotate-active .lc-content h1 { font-size: clamp(22px, 5vh, 34px); }
-  .farm-rotate-active .lc-level-card h2 { font-size: 14px; }
-  .farm-rotate-active .lc-level-icon { font-size: 25px; }
-}
-/* Toggle kept outside the rotating shell so it is always tappable. */
-.farm-orientation-button { display: none; }
-@media (orientation: portrait) and (pointer: coarse) {
-  .farm-orientation-button {
-    display: block;
-    position: fixed;
-    z-index: 2147483647;
-    right: 8px;
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-    border: 2px solid #fff7dc;
-    border-radius: 14px;
-    background: #28643e;
-    color: white;
-    padding: 9px 11px;
-    font: 800 12px/1.2 Arial,sans-serif;
-    box-shadow: 0 3px 12px #0005;
-    touch-action: manipulation;
-  }
-}
 
-/* Messenger portrait-browser fallback — November 2026
-   Keep the Normal view control OUTSIDE the rotated game, in a reserved strip.
-   Do not force OS orientation. The rotated view must scroll internally. */
-@media (orientation: portrait) and (pointer: coarse) {
-  body.farm-manual-landscape .farm-rotate-shell.farm-rotate-active {
-    top: 0 !important;
-    left: 0 !important;
-    width: calc(100dvh - 48px) !important;
-    height: 100vw !important;
-    min-height: 0 !important;
-    transform-origin: top left !important;
-    transform: translate(100vw, 48px) rotate(90deg) !important;
-    overflow: hidden !important;
+/* Messenger and Facebook: no artificial 90-degree rotation or blocking prompt. */
+body::before, body::after { content: none !important; }
+.farm-orientation-button { display: none !important; }
+.farm-rotate-shell { transform: none !important; width: 100%; min-height: 100%; }
+
+/* In-app browsers that stay portrait: allow scrolling rather than clipping. */
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
+  .lc-screen { min-height: 100dvh; height: auto; overflow-y: auto; }
+  .lc-content { max-height: none; padding-bottom: 24px; }
+  .lc-level-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .lc-level-card { min-height: 0; }
+  .fg-game, .l2-game, .l3-game, .l4-game, .l5-game {
+    height: auto; min-height: 100dvh; overflow: visible;
   }
-  body.farm-manual-landscape .farm-orientation-button {
-    left: 50% !important;
-    right: auto !important;
-    top: 5px !important;
-    bottom: auto !important;
-    transform: translateX(-50%);
-    min-height: 37px;
-    padding: 6px 16px;
-    white-space: nowrap;
+  .fg-layout, .l2-layout, .l3-layout, .l4-layout, .l5-layout {
+    display: flex; flex-direction: column; min-height: 0; height: auto;
   }
-  .farm-rotate-active .lc-screen {
-    display: flex !important;
-    flex-direction: column !important;
-    box-sizing: border-box;
-    overflow: hidden !important;
-    padding: 3px 6px !important;
+  .fg-world, .l2-left, .l3-left, .l4-left, .l5-left { min-width: 0; }
+  .fg-board, .l2-board, .l3-board, .l4-board, .l5-board {
+    min-height: 270px; height: min(64vw, 360px); flex: none;
   }
-  .farm-rotate-active .lc-toolbar {
-    flex: 0 0 auto !important;
-    min-height: 35px !important;
-    margin: 0 0 2px !important;
-    padding: 0 3px !important;
-  }
-  .farm-rotate-active .lc-toolbar button {
-    min-height: 31px !important;
-    padding: 4px 9px !important;
-    font-size: 11px !important;
-  }
-  .farm-rotate-active .lc-content {
-    flex: 1 1 0 !important;
-    min-height: 0 !important;
-    width: 100% !important;
-    max-height: none !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    padding: 3px 7px 22px !important;
-    margin: 0 !important;
-  }
-  .farm-rotate-active .lc-kicker {
-    padding: 4px 10px !important;
-    font-size: 12px !important;
-  }
-  .farm-rotate-active .lc-content h1 {
-    font-size: 25px !important;
-    margin: 3px 0 !important;
-  }
-  .farm-rotate-active .lc-subtitle {
-    font-size: 11px !important;
-    margin: 2px 0 7px !important;
-  }
-  .farm-rotate-active .lc-level-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 7px !important;
-    margin: 6px 0 0 !important;
-  }
-  .farm-rotate-active .lc-level-card {
-    box-sizing: border-box;
-    min-width: 0 !important;
-    min-height: 132px !important;
-    padding: 7px 5px !important;
-    border-width: 2px !important;
-  }
-  .farm-rotate-active .lc-level-icon { font-size: 23px !important; }
-  .farm-rotate-active .lc-level-card h2 {
-    font-size: 12px !important;
-    line-height: 1.1 !important;
-    margin: 3px 0 !important;
-  }
-  .farm-rotate-active .lc-level-card p {
-    font-size: 10px !important;
-    line-height: 1.25 !important;
-    margin: 3px 0 !important;
-  }
-  .farm-rotate-active .lc-level-button {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    padding: 6px 8px !important;
-    font-size: 11px !important;
-  }
-  .farm-rotate-active .lr-screen,
-  .farm-rotate-active .l2r-screen,
-  .farm-rotate-active .l3r-screen,
-  .farm-rotate-active .l4r-screen,
-  .farm-rotate-active .l5r-screen {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
+  .fg-sidebar, .l2-sidebar, .l3-sidebar, .l4-sidebar, .l5-sidebar {
+    display: flex; flex-direction: column; width: 100%; max-height: none; overflow: visible;
   }
 }
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 390px) {
+  .lc-level-grid { grid-template-columns: 1fr; }
+}
+.farm-assets-loading {
+  min-height: 100dvh; display: grid; place-items: center;
+  background: #e1efd6; padding: 20px; color: #28573b;
+  font-family: "Trebuchet MS", Arial, sans-serif; text-align: center;
+}
+.farm-assets-loading-card {
+  padding: 24px; background: #fff9e6; border: 4px solid #edcc80;
+  border-radius: 20px; box-shadow: 0 10px 30px #173c2c22;
+}
+.farm-music-error { position: fixed; top: 75px; right: 12px; z-index: 100; background: #fff7df; padding: 8px; }
