@@ -51,30 +51,9 @@
   transform: translate(-50%, 0);
 }
 
-/* Mobile browsers inside social apps sometimes report portrait even after
-   the device rotates. Never block the game with a full-screen overlay.
-   This small reminder is informational and cannot intercept taps. */
-@media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
-  body::before { content: none !important; }
-  body::after {
-    content: "📱 For a better experience, turn your phone sideways";
-    position: fixed;
-    top: env(safe-area-inset-top, 0px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2147483646;
-    box-sizing: border-box;
-    width: max-content;
-    max-width: 94vw;
-    padding: 5px 10px;
-    border-radius: 0 0 10px 10px;
-    background: rgba(255, 247, 223, .94);
-    color: #28643e;
-    font: 700 11px/1.3 "Trebuchet MS", Arial, sans-serif;
-    text-align: center;
-    white-space: normal;
-    pointer-events: none;
-  }
+/* Do not show any "turn your phone sideways" text. */
+@media (pointer: coarse) {
+  body::before, body::after { content: none !important; }
 }
 
 @media screen and (orientation: landscape) and (pointer: coarse) and (max-height: 620px) {
@@ -583,5 +562,111 @@
     font: 800 12px/1.2 Arial,sans-serif;
     box-shadow: 0 3px 12px #0005;
     touch-action: manipulation;
+  }
+}
+
+/* Messenger portrait-browser fallback — November 2026
+   Keep the Normal view control OUTSIDE the rotated game, in a reserved strip.
+   Do not force OS orientation. The rotated view must scroll internally. */
+@media (orientation: portrait) and (pointer: coarse) {
+  body.farm-manual-landscape .farm-rotate-shell.farm-rotate-active {
+    top: 0 !important;
+    left: 0 !important;
+    width: calc(100dvh - 48px) !important;
+    height: 100vw !important;
+    min-height: 0 !important;
+    transform-origin: top left !important;
+    transform: translate(100vw, 48px) rotate(90deg) !important;
+    overflow: hidden !important;
+  }
+  body.farm-manual-landscape .farm-orientation-button {
+    left: 50% !important;
+    right: auto !important;
+    top: 5px !important;
+    bottom: auto !important;
+    transform: translateX(-50%);
+    min-height: 37px;
+    padding: 6px 16px;
+    white-space: nowrap;
+  }
+  .farm-rotate-active .lc-screen {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box;
+    overflow: hidden !important;
+    padding: 3px 6px !important;
+  }
+  .farm-rotate-active .lc-toolbar {
+    flex: 0 0 auto !important;
+    min-height: 35px !important;
+    margin: 0 0 2px !important;
+    padding: 0 3px !important;
+  }
+  .farm-rotate-active .lc-toolbar button {
+    min-height: 31px !important;
+    padding: 4px 9px !important;
+    font-size: 11px !important;
+  }
+  .farm-rotate-active .lc-content {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 3px 7px 22px !important;
+    margin: 0 !important;
+  }
+  .farm-rotate-active .lc-kicker {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+  }
+  .farm-rotate-active .lc-content h1 {
+    font-size: 25px !important;
+    margin: 3px 0 !important;
+  }
+  .farm-rotate-active .lc-subtitle {
+    font-size: 11px !important;
+    margin: 2px 0 7px !important;
+  }
+  .farm-rotate-active .lc-level-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    margin: 6px 0 0 !important;
+  }
+  .farm-rotate-active .lc-level-card {
+    box-sizing: border-box;
+    min-width: 0 !important;
+    min-height: 132px !important;
+    padding: 7px 5px !important;
+    border-width: 2px !important;
+  }
+  .farm-rotate-active .lc-level-icon { font-size: 23px !important; }
+  .farm-rotate-active .lc-level-card h2 {
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    margin: 3px 0 !important;
+  }
+  .farm-rotate-active .lc-level-card p {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    margin: 3px 0 !important;
+  }
+  .farm-rotate-active .lc-level-button {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+  }
+  .farm-rotate-active .lr-screen,
+  .farm-rotate-active .l2r-screen,
+  .farm-rotate-active .l3r-screen,
+  .farm-rotate-active .l4r-screen,
+  .farm-rotate-active .l5r-screen {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 }
