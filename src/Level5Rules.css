@@ -1,0 +1,17 @@
+.l5r-screen,.l5r-screen *{box-sizing:border-box}
+.l5r-screen{position:fixed;inset:0;z-index:40;display:grid;place-items:center;overflow:auto;padding:18px;font-family:"Trebuchet MS",Arial,sans-serif;color:#25563d;background:#73b66b url('/farm-cover.jpg') center/cover no-repeat}
+.l5r-shade{position:fixed;inset:0;background:#0e43318a;pointer-events:none}
+.l5r-card{position:relative;z-index:1;width:min(950px,96vw);max-height:94dvh;overflow:auto;padding:22px 25px 20px;border:5px solid #edcc80;border-radius:30px;background:#fff9e6;box-shadow:0 15px 50px #173c2c88;text-align:center}
+.l5r-eyebrow{display:inline-block;padding:8px 17px;border-radius:999px;background:#e1efd6;color:#367346;font-weight:900;font-size:13px}
+.l5r-card h1{margin:13px 0 6px;color:#2b6843;font:700 clamp(29px,4vw,44px) Georgia,serif}
+.l5r-intro{max-width:720px;margin:0 auto 16px;line-height:1.5;font-size:14px;font-weight:700}
+.l5r-rules{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left}
+.l5r-rule{display:flex;align-items:flex-start;gap:10px;min-height:70px;padding:10px 12px;background:#e8f3e0;border:1px solid #cddfba;border-radius:13px}
+.l5r-emoji{font-size:23px;flex:0 0 28px}
+.l5r-rule strong{font-size:13px;color:#286c3f}
+.l5r-rule p{font-size:12px;line-height:1.35;margin:4px 0 0;color:#3a5d43}
+.l5r-actions{display:flex;justify-content:center;gap:13px;flex-wrap:wrap;margin-top:18px}
+.l5r-actions button{padding:11px 20px;border:0;border-radius:13px;cursor:pointer;font:900 14px "Trebuchet MS",Arial,sans-serif}
+.l5r-back{background:#e5ebdb;color:#4b6544}
+.l5r-start{background:#44a35b;color:white;box-shadow:0 3px 0 #1c6837}
+@media(max-width:700px){.l5r-screen{padding:6px}.l5r-card{padding:15px 11px;max-height:98dvh}.l5r-rules{grid-template-columns:1fr;gap:6px}.l5r-rule{min-height:0;padding:8px}.l5r-rule p{font-size:11px}}

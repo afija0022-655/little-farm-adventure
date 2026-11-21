@@ -4,10 +4,12 @@ import LevelRules from "./LevelRules";
 import Level2Rules from "./Level2Rules";
 import Level3Rules from "./Level3Rules";
 import Level4Rules from "./Level4Rules";
+import Level5Rules from "./Level5Rules";
 import FarmGame from "./FarmGame";
 import Level2Game from "./Level2Game";
 import Level3Game from "./Level3Game";
 import Level4Game from "./Level4Game";
+import Level5Game from "./Level5Game";
 import "./StartPage.css";
 import "./MobileLandscape.css";
 
@@ -21,8 +23,8 @@ const MELODY = [
 // sessionStorage only remembers the screen, not the live farming round.
 const LAST_PAGE_KEY = "littleFarmCurrentPage";
 const VALID_PAGES = new Set([
-  "start", "levels", "rules1", "rules2", "rules3", "rules4",
-  "game1", "game2", "game3", "game4",
+  "start", "levels", "rules1", "rules2", "rules3", "rules4", "rules5",
+  "game1", "game2", "game3", "game4", "game5",
 ]);
 
 function getInitialPage() {
@@ -37,7 +39,6 @@ function getInitialPage() {
 export default function StartPage() {
   const [page, setPage] = useState(getInitialPage);
 
-  // Save each navigation change; on refresh open this page again.
   useEffect(() => {
     try {
       window.sessionStorage.setItem(LAST_PAGE_KEY, page);
@@ -103,7 +104,6 @@ export default function StartPage() {
   }, []);
 
   const goToStart = () => {
-    // Update immediately so a refresh after exiting stays on Start Page.
     try { window.sessionStorage.setItem(LAST_PAGE_KEY, "start"); } catch { /* storage unavailable */ }
     setPage("start");
   };
@@ -113,27 +113,15 @@ export default function StartPage() {
   const startLevelTwo = () => setPage("game2");
   const startLevelThree = () => setPage("game3");
   const startLevelFour = () => setPage("game4");
+  const startLevelFive = () => setPage("game5");
 
   function playSelectedLevel(level) {
     if (level === 1) { playLevelOne(); return; }
-    if (level === 2) {
-      let unlocked = 1;
-      try {
-        unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1);
-      } catch { /* browser without storage */ }
-      if (unlocked >= 2) setPage("rules2"); // RULES FIRST, no automatic countdown.
-    }
-    if (level === 3) {
+    if (level >= 2 && level <= 5) {
       let unlocked = 1;
       try { unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1); }
       catch { /* browser without storage */ }
-      if (unlocked >= 3) setPage("rules3");
-    }
-    if (level === 4) {
-      let unlocked = 1;
-      try { unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1); }
-      catch { /* browser without storage */ }
-      if (unlocked >= 4) setPage("rules4");
+      if (unlocked >= level) setPage(`rules${level}`);
     }
   }
 
@@ -152,34 +140,34 @@ export default function StartPage() {
   if (page === "rules1") {
     return <LevelRules onBack={goToLevels} onFinish={startLevelOne} />;
   }
-
   if (page === "rules2") {
     return <Level2Rules onBack={goToLevels} onFinish={startLevelTwo} />;
   }
-
   if (page === "rules3") {
     return <Level3Rules onBack={goToLevels} onFinish={startLevelThree} />;
   }
-
-  if (page === "game3") {
-    return <Level3Game onNextLevel={goToLevels} onExit={goToStart} />;
-  }
-
   if (page === "rules4") {
     return <Level4Rules onBack={goToLevels} onFinish={startLevelFour} />;
   }
-
-  if (page === "game4") {
-    return <Level4Game onNextLevel={goToLevels} onExit={goToStart} />;
+  if (page === "rules5") {
+    return <Level5Rules onBack={goToLevels} onFinish={startLevelFive} />;
   }
 
   if (page === "game1") {
     return <FarmGame onNextLevel={goToLevels} onExit={goToStart} />;
   }
-
   if (page === "game2") {
     // Level 2 intentionally has no Back button during gameplay.
     return <Level2Game onNextLevel={goToLevels} onExit={goToStart} />;
+  }
+  if (page === "game3") {
+    return <Level3Game onNextLevel={goToLevels} onExit={goToStart} />;
+  }
+  if (page === "game4") {
+    return <Level4Game onNextLevel={goToLevels} onExit={goToStart} />;
+  }
+  if (page === "game5") {
+    return <Level5Game onNextLevel={goToLevels} onExit={goToStart} />;
   }
 
   return (
