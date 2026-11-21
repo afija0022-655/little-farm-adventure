@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import LevelChoose from "./LevelChoose";
 import LevelRules from "./LevelRules";
 import Level2Rules from "./Level2Rules";
+import Level3Rules from "./Level3Rules";
 import FarmGame from "./FarmGame";
 import Level2Game from "./Level2Game";
+import Level3Game from "./Level3Game";
 import "./StartPage.css";
 
 // Original little farm background tune (music is optional).
@@ -76,6 +78,7 @@ export default function StartPage() {
   const playLevelOne = () => setPage("rules1");
   const startLevelOne = () => setPage("game1");
   const startLevelTwo = () => setPage("game2");
+  const startLevelThree = () => setPage("game3");
 
   function playSelectedLevel(level) {
     if (level === 1) { playLevelOne(); return; }
@@ -85,6 +88,12 @@ export default function StartPage() {
         unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1);
       } catch { /* browser without storage */ }
       if (unlocked >= 2) setPage("rules2"); // RULES FIRST, no automatic countdown.
+    }
+    if (level === 3) {
+      let unlocked = 1;
+      try { unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1); }
+      catch { /* browser without storage */ }
+      if (unlocked >= 3) setPage("rules3");
     }
   }
 
@@ -106,6 +115,14 @@ export default function StartPage() {
 
   if (page === "rules2") {
     return <Level2Rules onBack={goToLevels} onFinish={startLevelTwo} />;
+  }
+
+  if (page === "rules3") {
+    return <Level3Rules onBack={goToLevels} onFinish={startLevelThree} />;
+  }
+
+  if (page === "game3") {
+    return <Level3Game onNextLevel={goToLevels} />;
   }
 
   if (page === "game1") {

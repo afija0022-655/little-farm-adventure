@@ -4,7 +4,7 @@ import "./LevelChoose.css";
 const LEVELS = [
   { number: 1, icon: "🥕", title: "Beginner Farmer", description: "Carrots and first deliveries" },
   { number: 2, icon: "🧅", title: "Vegetable & Chicken Farm", description: "Carrot, onion, chickens and eggs" },
-  { number: 3, icon: "🐔", title: "Animal Farm", description: "Care for farm animals" },
+  { number: 3, icon: "🐄", title: "Animal Farm", description: "Cows, milk, eggs and rabbits" },
   { number: 4, icon: "🐄", title: "Happy Farm", description: "Grow your farm further" },
   { number: 5, icon: "🌻", title: "Master Farmer", description: "Build a thriving farm" },
   { number: 6, icon: "🏆", title: "Farm Legend", description: "The final adventure" },
@@ -45,6 +45,12 @@ export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onTo
       return;
     }
 
+    if (level === 3) {
+      if (onPlayLevel) onPlayLevel(3);
+      else setNotice("Level 3 is unlocked. Connect onPlayLevel in StartPage.jsx!");
+      return;
+    }
+
     setNotice(`🎉 Level ${level} is unlocked! Its gameplay will be added next.`);
   }
 
@@ -78,7 +84,7 @@ export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onTo
                   <div className="lc-level-button lc-disabled">🔒 LOCKED</div>
                 ) : (
                   <button type="button" className="lc-level-button" onClick={() => selectLevel(level.number)}>
-                    {level.number <= 2 ? "▶ PLAY" : "🔓 OPEN LEVEL"}
+                    {level.number <= 3 ? "▶ PLAY" : "🔓 OPEN LEVEL"}
                   </button>
                 )}
                 {done && <span className="lc-cleared">✅ CLEARED</span>}
