@@ -466,3 +466,122 @@
     bottom: auto !important;
   }
 }
+
+
+/* In-app browser fallback: rotate our GAME CONTENT, not the OS browser. */
+.farm-rotate-shell { width: 100%; min-height: 100%; }
+@media (orientation: portrait) and (pointer: coarse) {
+  body.farm-manual-landscape { margin: 0; overflow: hidden; }
+  body.farm-manual-landscape::after { display: none !important; }
+  .farm-rotate-shell.farm-rotate-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100dvh;
+    height: 100vw;
+    min-height: 0;
+    overflow: hidden;
+    transform-origin: top left;
+    transform: translateX(100vw) rotate(90deg);
+  }
+  .farm-rotate-active > main,
+  .farm-rotate-active .fg-game,
+  .farm-rotate-active .l2-game,
+  .farm-rotate-active .l3-game,
+  .farm-rotate-active .l4-game,
+  .farm-rotate-active .l5-game,
+  .farm-rotate-active .lc-screen,
+  .farm-rotate-active .lr-screen,
+  .farm-rotate-active .l2r-screen,
+  .farm-rotate-active .l3r-screen,
+  .farm-rotate-active .l4r-screen,
+  .farm-rotate-active .l5r-screen {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+  }
+  .farm-rotate-active .fg-game,
+  .farm-rotate-active .l2-game,
+  .farm-rotate-active .l3-game,
+  .farm-rotate-active .l4-game,
+  .farm-rotate-active .l5-game {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 3px;
+    padding: 3px;
+  }
+  .farm-rotate-active .fg-layout,
+  .farm-rotate-active .l2-layout,
+  .farm-rotate-active .l3-layout,
+  .farm-rotate-active .l4-layout,
+  .farm-rotate-active .l5-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(145px, 22%, 200px);
+    grid-template-rows: minmax(0, 1fr);
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+    gap: 5px;
+  }
+  .farm-rotate-active .fg-world,
+  .farm-rotate-active .l2-left,
+  .farm-rotate-active .l3-left,
+  .farm-rotate-active .l4-left,
+  .farm-rotate-active .l5-left { min-height: 0; overflow: hidden; }
+  .farm-rotate-active .fg-board,
+  .farm-rotate-active .l2-board,
+  .farm-rotate-active .l3-board,
+  .farm-rotate-active .l4-board,
+  .farm-rotate-active .l5-board { min-height: 0; flex: 1 1 0; }
+  .farm-rotate-active .fg-sidebar,
+  .farm-rotate-active .l2-sidebar,
+  .farm-rotate-active .l3-sidebar,
+  .farm-rotate-active .l4-sidebar,
+  .farm-rotate-active .l5-sidebar {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  .farm-rotate-active .lc-level-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .farm-rotate-active .lc-content {
+    max-width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-bottom: 15px;
+  }
+  .farm-rotate-active .lc-level-card { min-height: 140px; padding: 7px; }
+  .farm-rotate-active .lc-content h1 { font-size: clamp(22px, 5vh, 34px); }
+  .farm-rotate-active .lc-level-card h2 { font-size: 14px; }
+  .farm-rotate-active .lc-level-icon { font-size: 25px; }
+}
+/* Toggle kept outside the rotating shell so it is always tappable. */
+.farm-orientation-button { display: none; }
+@media (orientation: portrait) and (pointer: coarse) {
+  .farm-orientation-button {
+    display: block;
+    position: fixed;
+    z-index: 2147483647;
+    right: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    border: 2px solid #fff7dc;
+    border-radius: 14px;
+    background: #28643e;
+    color: white;
+    padding: 9px 11px;
+    font: 800 12px/1.2 Arial,sans-serif;
+    box-shadow: 0 3px 12px #0005;
+    touch-action: manipulation;
+  }
+}

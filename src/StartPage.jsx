@@ -125,6 +125,31 @@ export default function StartPage() {
     }
   }
 
+  // iPhone Messenger/Facebook sometimes keeps the browser in portrait.
+  // This rotates the game VIEW only; it does not rotate the phone or browser UI.
+  const [manualLandscape, setManualLandscape] = useState(false);
+  const [portraitPhone, setPortraitPhone] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(orientation: portrait) and (pointer: coarse)").matches
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia("(orientation: portrait) and (pointer: coarse)");
+    const update = () => {
+      setPortraitPhone(query.matches);
+      if (!query.matches) setManualLandscape(false);
+    };
+    update();
+    query.addEventListener?.("change", update);
+    return () => query.removeEventListener?.("change", update);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("farm-manual-landscape", manualLandscape);
+    return () => document.body.classList.remove("farm-manual-landscape");
+  }, [manualLandscape]);
+
+  function renderPage() {
   if (page === "levels") {
     return (
       <LevelChoose
@@ -186,5 +211,25 @@ export default function StartPage() {
         <button className="farm-play-button" type="button" onClick={goToLevels}>▶ START GAME</button>
       </section>
     </main>
+  );
+  }
+
+  return (
+    <>
+      <div className={manualLandscape ? "farm-rotate-shell farm-rotate-active" : "farm-rotate-shell"}>
+        {renderPage()}
+      </div>
+      {portraitPhone && (
+        <button
+          type="button"
+          className="farm-orientation-button"
+          onClick={() => setManualLandscape((value) => !value)}
+          aria-pressed={manualLandscape}
+          aria-label={manualLandscape ? "Return to normal view" : "Rotate game view for landscape play"}
+        >
+          {manualLandscape ? "↩ Normal view" : "↻ Play sideways"}
+        </button>
+      )}
+    </>
   );
 }

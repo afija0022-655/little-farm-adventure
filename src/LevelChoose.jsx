@@ -6,7 +6,7 @@ const LEVELS = [
   { number: 2, icon: "🧅", title: "Vegetable & Chicken Farm", description: "Carrot, onion, chickens and eggs" },
   { number: 3, icon: "🐄", title: "Animal Farm", description: "Cows, milk, eggs and rabbits" },
   { number: 4, icon: "🐄", title: "Happy Farm", description: "5 minutes • 800 delivery Coins" },
-  { number: 5, icon: "🌻", title: "Master Farmer", description: "Build a thriving farm" },
+  { number: 5, icon: "🌻", title: "Master Farmer", description: "5 minutes • 1000 delivery Coins" },
   { number: 6, icon: "🏆", title: "Farm Legend", description: "The final adventure" },
 ];
 
@@ -19,45 +19,23 @@ function readUnlockedLevel() {
   }
 }
 
-// Props match the existing StartPage.jsx usage:
-// <LevelChoose onBack={goToStart} onPlay={playLevelOne}
-//   musicOn={musicOn} onToggleMusic={toggleMusic} />
 export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onToggleMusic }) {
   const [unlockedLevel, setUnlockedLevel] = useState(readUnlockedLevel);
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    // The component mounts each time the user returns from Level 1.
     setUnlockedLevel(readUnlockedLevel());
   }, []);
 
   function selectLevel(level) {
     if (level > unlockedLevel) return;
-
-    if (level === 1) {
-      onPlay?.();
+    if (level === 1) { onPlay?.(); return; }
+    if (level >= 2 && level <= 5) {
+      if (onPlayLevel) onPlayLevel(level);
+      else setNotice(`Level ${level} is unlocked, but navigation is not connected.`);
       return;
     }
-
-    if (level === 2) {
-      if (onPlayLevel) onPlayLevel(2);
-      else setNotice("Level 2 is unlocked. Connect onPlayLevel in StartPage.jsx!");
-      return;
-    }
-
-    if (level === 3) {
-      if (onPlayLevel) onPlayLevel(3);
-      else setNotice("Level 3 is unlocked. Connect onPlayLevel in StartPage.jsx!");
-      return;
-    }
-
-    if (level === 4) {
-      if (onPlayLevel) onPlayLevel(4);
-      else setNotice("Level 4 is unlocked. Connect onPlayLevel in StartPage.jsx!");
-      return;
-    }
-
-    setNotice(`🎉 Level ${level} is unlocked! Its gameplay will be added next.`);
+    setNotice("🏆 Level 6 gameplay is coming soon!");
   }
 
   return (
@@ -69,17 +47,14 @@ export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onTo
           {musicOn ? "🔊 MUSIC ON" : "🔇 MUSIC OFF"}
         </button>
       </header>
-
       <section className="lc-content">
         <div className="lc-kicker">🌟 Your adventure begins</div>
         <h1>Choose a Level</h1>
         <p className="lc-subtitle">Complete a level to unlock the next one!</p>
-
         <div className="lc-level-grid">
           {LEVELS.map((level) => {
             const locked = level.number > unlockedLevel;
             const done = level.number < unlockedLevel;
-
             return (
               <article className={`lc-level-card ${locked ? "lc-locked" : "lc-unlocked"}`} key={level.number}>
                 <span className="lc-level-icon" aria-hidden="true">{locked ? "🔒" : level.icon}</span>
@@ -90,7 +65,7 @@ export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onTo
                   <div className="lc-level-button lc-disabled">🔒 LOCKED</div>
                 ) : (
                   <button type="button" className="lc-level-button" onClick={() => selectLevel(level.number)}>
-                    {level.number <= 4 ? "▶ PLAY" : "🔓 OPEN LEVEL"}
+                    {level.number <= 5 ? "▶ PLAY" : "🔓 OPEN LEVEL"}
                   </button>
                 )}
                 {done && <span className="lc-cleared">✅ CLEARED</span>}
@@ -98,7 +73,6 @@ export default function LevelChoose({ onBack, onPlay, onPlayLevel, musicOn, onTo
             );
           })}
         </div>
-
         {notice && <div className="lc-notice" role="status">{notice}</div>}
       </section>
     </main>
