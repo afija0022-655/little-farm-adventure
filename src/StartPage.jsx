@@ -3,9 +3,11 @@ import LevelChoose from "./LevelChoose";
 import LevelRules from "./LevelRules";
 import Level2Rules from "./Level2Rules";
 import Level3Rules from "./Level3Rules";
+import Level4Rules from "./Level4Rules";
 import FarmGame from "./FarmGame";
 import Level2Game from "./Level2Game";
 import Level3Game from "./Level3Game";
+import Level4Game from "./Level4Game";
 import "./StartPage.css";
 
 // Original little farm background tune (music is optional).
@@ -79,6 +81,7 @@ export default function StartPage() {
   const startLevelOne = () => setPage("game1");
   const startLevelTwo = () => setPage("game2");
   const startLevelThree = () => setPage("game3");
+  const startLevelFour = () => setPage("game4");
 
   function playSelectedLevel(level) {
     if (level === 1) { playLevelOne(); return; }
@@ -94,6 +97,12 @@ export default function StartPage() {
       try { unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1); }
       catch { /* browser without storage */ }
       if (unlocked >= 3) setPage("rules3");
+    }
+    if (level === 4) {
+      let unlocked = 1;
+      try { unlocked = Number(localStorage.getItem("littleFarmUnlockedLevel") || 1); }
+      catch { /* browser without storage */ }
+      if (unlocked >= 4) setPage("rules4");
     }
   }
 
@@ -123,6 +132,14 @@ export default function StartPage() {
 
   if (page === "game3") {
     return <Level3Game onNextLevel={goToLevels} />;
+  }
+
+  if (page === "rules4") {
+    return <Level4Rules onBack={goToLevels} onFinish={startLevelFour} />;
+  }
+
+  if (page === "game4") {
+    return <Level4Game onNextLevel={goToLevels} />;
   }
 
   if (page === "game1") {
