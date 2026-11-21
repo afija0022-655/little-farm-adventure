@@ -116,88 +116,60 @@ export default function StartPage() {
 
   const [musicOn, setMusicOn] = useState(false);
   const [musicError, setMusicError] = useState("");
-  const musicOnRef = useRef(false);
   const audioRef = useRef(null);
-  const intervalRef = useRef(null);
-  const noteIndexRef = useRef(0);
+  const musicEnabledRef = useRef(false);
 
-  function clearMusicInterval() {
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+  function getMusic() {
+    if (!audioRef.current) {
+      const audio = new Audio("/little-farm-melody.wav");
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.volume = 0.9;
+      audioRef.current = audio;
     }
+    return audioRef.current;
   }
 
   function stopMusic() {
-    musicOnRef.current = false;
-    clearMusicInterval();
-    const ctx = audioRef.current;
-    audioRef.current = null;
-    if (ctx) ctx.close().catch(() => {});
+    musicEnabledRef.current = false;
+    const audio = audioRef.current;
+    if (audio) { audio.pause(); audio.currentTime = 0; }
     setMusicOn(false);
     setMusicError("");
   }
 
-  // Keep the original melody, instruments and rhythm unchanged.
-  function playNote(context, frequency) {
-    if (context.state === "closed") return;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const t = context.currentTime;
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(frequency, t);
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(0.045, t + 0.04);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(t);
-    oscillator.stop(t + 0.36);
-  }
-
-  function playNextNote() {
-    const ctx = audioRef.current;
-    if (!musicOnRef.current || !ctx || ctx.state !== "running") return;
-    playNote(ctx, MELODY[noteIndexRef.current % MELODY.length]);
-    noteIndexRef.current += 1;
-  }
-
   function toggleMusic() {
-    if (musicOnRef.current) { stopMusic(); return; }
-    const Engine = window.AudioContext || window.webkitAudioContext;
-    if (!Engine) {
-      setMusicError("This browser does not support game music.");
-      return;
-    }
+    if (musicEnabledRef.current) { stopMusic(); return; }
     try {
-      // Create, resume and schedule the first oscillator within THIS tap.
-      // Do not await resume() before scheduling: that may fail on iOS WebKit.
-      const ctx = new Engine();
-      audioRef.current = ctx;
-      musicOnRef.current = true;
-      noteIndexRef.current = 0;
+      const audio = getMusic();
+      musicEnabledRef.current = true;
       setMusicError("");
-      if (ctx.state !== "running") ctx.resume().catch(() => {});
-      playNote(ctx, MELODY[noteIndexRef.current++]);
-      clearMusicInterval();
-      intervalRef.current = setInterval(() => {
-        if (ctx.state === "interrupted" || ctx.state === "suspended") {
-          ctx.resume().catch(() => {});
-        }
-        playNextNote();
-      }, 410);
-      setMusicOn(true);
+      // Play is called synchronously inside the user's click/tap.
+      // This is more reliable on iPhone than awaiting AudioContext.resume().
+      const playing = audio.play();
+      if (playing && typeof playing.then === "function") {
+        playing.then(() => {
+          if (musicEnabledRef.current) setMusicOn(true);
+        }).catch(() => {
+          musicEnabledRef.current = false;
+          setMusicOn(false);
+          setMusicError("Music was blocked. Check volume / Silent Mode and tap Music ON again.");
+        });
+      } else {
+        setMusicOn(true);
+      }
     } catch {
-      stopMusic();
-      setMusicError("Music could not start. Tap Music ON again.");
+      musicEnabledRef.current = false;
+      setMusicOn(false);
+      setMusicError("Music could not start on this browser.");
     }
   }
 
   useEffect(() => {
     function handleReturn() {
-      const ctx = audioRef.current;
-      if (document.visibilityState === "visible" && musicOnRef.current && ctx && ctx.state !== "running") {
-        ctx.resume().catch(() => {});
+      // Do not autoplay on first load; only resume after an explicit ON tap.
+      if (document.visibilityState === "visible" && musicEnabledRef.current && audioRef.current?.paused) {
+        audioRef.current.play().catch(() => { setMusicOn(false); musicEnabledRef.current = false; });
       }
     }
     document.addEventListener("visibilitychange", handleReturn);
@@ -205,8 +177,7 @@ export default function StartPage() {
     return () => {
       document.removeEventListener("visibilitychange", handleReturn);
       window.removeEventListener("pageshow", handleReturn);
-      clearMusicInterval();
-      if (audioRef.current) audioRef.current.close().catch(() => {});
+      if (audioRef.current) audioRef.current.pause();
     };
   }, []);
 

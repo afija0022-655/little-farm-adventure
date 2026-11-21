@@ -486,3 +486,119 @@ body::before, body::after { content: none !important; }
   border-radius: 20px; box-shadow: 0 10px 30px #173c2c22;
 }
 .farm-music-error { position: fixed; top: 75px; right: 12px; z-index: 100; background: #fff7df; padding: 8px; }
+
+
+/* ================================================
+   PORTRAIT PHONE FIX — avoid clipped truck controls
+   and overlapping cargo popup; desktop unaffected.
+   ================================================ */
+@media screen and (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
+  .fg-game, .l2-game, .l3-game, .l4-game, .l5-game {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    padding: 8px;
+    gap: 8px;
+  }
+  .fg-header, .l2-topbar, .l3-topbar, .l4-topbar, .l5-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+  }
+  .fg-header-actions, .l2-top-actions, .l3-top-actions, .l4-top-actions, .l5-top-actions {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 4px;
+  }
+  .fg-top-restart, .fg-top-pause, .fg-header-actions .fg-top-exit,
+  .l2-top-actions button, .l3-top-actions button, .l4-top-actions button, .l5-top-actions button {
+    width: auto;
+    min-width: 36px;
+    height: 38px;
+    padding: 4px 6px;
+    font-size: 14px;
+  }
+  .fg-clock, .l2-clock, .l3-clock, .l4-clock, .l5-clock {
+    flex: 1 1 145px;
+    min-width: 0;
+    padding: 5px;
+  }
+  .fg-inventory, .l2-wallet, .l3-wallet, .l4-wallet, .l5-wallet {
+    flex: 0 1 auto;
+  }
+  .fg-world, .l2-left, .l3-left, .l4-left, .l5-left {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 5px;
+    min-width: 0;
+    overflow: visible;
+  }
+  .fg-board, .l2-board, .l3-board, .l4-board, .l5-board {
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    height: clamp(320px, 92vw, 470px);
+    min-height: 320px;
+    overflow: hidden;
+  }
+  /* Make truck cargo a label, not a floating card covering gameplay. */
+  .fg-truck-tooltip, .l2-truck-tooltip,
+  .l3-truck-tooltip, .l4-truck-tooltip, .l5-truck-tooltip,
+  .fg-truck-visual:hover .fg-truck-tooltip,
+  .fg-truck-visual:focus .fg-truck-tooltip,
+  .l2-truck-visual:hover .l2-truck-tooltip,
+  .l2-truck-visual:focus .l2-truck-tooltip {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .fg-board .fg-truck, .l2-board .l2-truck,
+  .l3-board .l3-truck, .l4-board .l4-truck,
+  .l5-board .l5-truck {
+    bottom: 18px !important;
+    right: 6% !important;
+    width: min(33%, 165px) !important;
+    max-width: 165px;
+  }
+  /* Keep the GO button inside the grass area rather than below its bottom edge. */
+  .fg-board .fg-go, .l2-board .l2-go, .l3-board .l3-go,
+  .l4-board .l4-go, .l5-board .l5-go {
+    position: absolute;
+    left: -64px !important;
+    top: 1px !important;
+    bottom: auto !important;
+    min-width: 51px;
+    min-height: 38px;
+    z-index: 10;
+  }
+  .fg-board .fg-truck-count, .l2-board .l2-truck-label,
+  .l3-board .l3-truck-label, .l4-board .l4-truck-label,
+  .l5-board .l5-truck-label {
+    left: -64px !important;
+    top: -25px !important;
+    bottom: auto !important;
+    z-index: 10;
+  }
+  .fg-message, .l2-message, .l3-message, .l4-message, .l5-message {
+    margin-top: 6px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .fg-sidebar, .l2-sidebar, .l3-sidebar, .l4-sidebar, .l5-sidebar {
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+  }
+}
+@media screen and (orientation: portrait) and (pointer: coarse) and (max-width: 390px) {
+  .fg-board .fg-truck, .l2-board .l2-truck,
+  .l3-board .l3-truck, .l4-board .l4-truck,
+  .l5-board .l5-truck { right: 4% !important; }
+  .fg-board .fg-go, .l2-board .l2-go, .l3-board .l3-go,
+  .l4-board .l4-go, .l5-board .l5-go { left: -57px !important; }
+}
