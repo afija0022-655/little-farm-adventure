@@ -13,6 +13,29 @@ import Level5Game from "./Level5Game";
 import "./StartPage.css";
 import "./MobileLandscape.css";
 
+// Preload commonly used game artwork after the first page renders.
+// Images are cached by the browser when possible. This does not alter game timers.
+const GAME_IMAGES = [
+  "/farm-cover.jpg",
+  "/level.jpg",
+  "/level1background.jpg",
+  "/farmer-character.png",
+  "/barn.png",
+  "/chicken.png",
+  "/cow.png",
+  "/rabbit.png",
+  "/delivery-car.png",
+  "/water-bucket.png",
+  "/dead-plant.png",
+];
+
+function preloadGameImages() {
+  GAME_IMAGES.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
 // Original little farm background tune (music is optional).
 const MELODY = [
   392, 440, 523.25, 659.25, 523.25, 440, 392, 329.63,
@@ -40,12 +63,17 @@ export default function StartPage() {
   const [page, setPage] = useState(getInitialPage);
 
   useEffect(() => {
+    preloadGameImages();
+  }, []);
+
+  useEffect(() => {
     try {
       window.sessionStorage.setItem(LAST_PAGE_KEY, page);
     } catch {
       // Private-mode / blocked storage: keep the game usable.
     }
   }, [page]);
+
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
@@ -105,7 +133,6 @@ export default function StartPage() {
 
   const goToStart = () => {
     try { window.sessionStorage.setItem(LAST_PAGE_KEY, "start"); } catch { /* storage unavailable */ }
-    setManualLandscape(false);
     setPage("start");
   };
   const goToLevels = () => setPage("levels");
@@ -126,31 +153,6 @@ export default function StartPage() {
     }
   }
 
-  // iPhone Messenger/Facebook sometimes keeps the browser in portrait.
-  // This rotates the game VIEW only; it does not rotate the phone or browser UI.
-  const [manualLandscape, setManualLandscape] = useState(false);
-  const [portraitPhone, setPortraitPhone] = useState(() =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(orientation: portrait) and (pointer: coarse)").matches
-  );
-
-  useEffect(() => {
-    const query = window.matchMedia("(orientation: portrait) and (pointer: coarse)");
-    const update = () => {
-      setPortraitPhone(query.matches);
-      if (!query.matches) setManualLandscape(false);
-    };
-    update();
-    query.addEventListener?.("change", update);
-    return () => query.removeEventListener?.("change", update);
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle("farm-manual-landscape", manualLandscape);
-    return () => document.body.classList.remove("farm-manual-landscape");
-  }, [manualLandscape]);
-
-  function renderPage() {
   if (page === "levels") {
     return (
       <LevelChoose
@@ -212,25 +214,5 @@ export default function StartPage() {
         <button className="farm-play-button" type="button" onClick={goToLevels}>▶ START GAME</button>
       </section>
     </main>
-  );
-  }
-
-  return (
-    <>
-      <div className={manualLandscape ? "farm-rotate-shell farm-rotate-active" : "farm-rotate-shell"}>
-        {renderPage()}
-      </div>
-      {portraitPhone && page !== "start" && (
-        <button
-          type="button"
-          className="farm-orientation-button"
-          onClick={() => setManualLandscape((value) => !value)}
-          aria-pressed={manualLandscape}
-          aria-label={manualLandscape ? "Return to normal view" : "Rotate game view for landscape play"}
-        >
-          {manualLandscape ? "↩ Normal view" : "↻ Play sideways"}
-        </button>
-      )}
-    </>
   );
 }
