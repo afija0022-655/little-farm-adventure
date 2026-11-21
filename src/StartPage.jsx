@@ -105,6 +105,7 @@ export default function StartPage() {
 
   const goToStart = () => {
     try { window.sessionStorage.setItem(LAST_PAGE_KEY, "start"); } catch { /* storage unavailable */ }
+    setManualLandscape(false);
     setPage("start");
   };
   const goToLevels = () => setPage("levels");
@@ -219,7 +220,7 @@ export default function StartPage() {
       <div className={manualLandscape ? "farm-rotate-shell farm-rotate-active" : "farm-rotate-shell"}>
         {renderPage()}
       </div>
-      {portraitPhone && (
+      {portraitPhone && page !== "start" && (
         <button
           type="button"
           className="farm-orientation-button"
