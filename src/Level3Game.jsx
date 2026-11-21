@@ -171,7 +171,7 @@ function segmentTime(from, to) {
   return Math.max(FARMER_MIN_SEGMENT, Math.min(FARMER_MAX_SEGMENT, dist / FARMER_SPEED));
 }
 
-export default function Level3Game({ onNextLevel }) {
+export default function Level3Game({ onNextLevel, onExit }) {
   const gameStart = useRef(Date.now());
   const pausedAt = useRef(null);
   const pausedTotal = useRef(0);
@@ -1128,6 +1128,7 @@ export default function Level3Game({ onNextLevel }) {
         <div className="l3-top-actions">
           <button type="button" onClick={restart} title="Restart">↻</button>
           <button type="button" onClick={togglePause} title={paused ? "Resume" : "Pause"}>{paused ? "▶" : "Ⅱ"}</button>
+          <button type="button" className="l3-exit" onClick={onExit} title="Exit to Start Page" aria-label="Exit Level 3 to Start Page">EXIT</button>
         </div>
         <div className={`l3-clock ${left <= 10 ? "urgent" : ""}`}>
           <strong>⏰ LEVEL 3 — {timeLabel(left)}</strong>
@@ -1290,6 +1291,7 @@ export default function Level3Game({ onNextLevel }) {
               <div
                 className="l3-truck-visual"
                 tabIndex={0}
+                onClick={(event) => event.currentTarget.focus()}
                 role="group"
                 aria-label={`Delivery truck: ${cargo.carrot} carrots, ${cargo.onion} onions, ${cargo.egg} eggs, ${cargo.milk} milk packets; ${cargoCount(cargo)} of ${TRUCK_LIMIT} items loaded. Hover or focus for details.`}
               >
@@ -1340,7 +1342,7 @@ export default function Level3Game({ onNextLevel }) {
         </aside>
       </div>
 
-      {paused && !result && <div className="l3-overlay"><div className="l3-modal"><h2>⏸ Game Paused</h2><p>The clock, crops, cows, chickens, rabbit and truck are frozen.</p><button type="button" onClick={togglePause}>▶ RESUME</button></div></div>}
+      {paused && !result && <div className="l3-overlay"><div className="l3-modal"><h2>⏸ Game Paused</h2><p>The clock, crops, cows, chickens, rabbit and truck are frozen.</p><button type="button" onClick={togglePause}>▶ RESUME</button><button type="button" className="farm-exit-modal-button" onClick={onExit}>EXIT → START</button></div></div>}
       {/* Level 3 result uses the SAME visual design as Level 1's result card. */}
       {result && (
         <div className="l3-overlay l3-result-overlay">
@@ -1407,6 +1409,7 @@ export default function Level3Game({ onNextLevel }) {
               >
                 ↻ PLAY AGAIN
               </button>
+              <button type="button" className="l3-result-button farm-exit-modal-button" onClick={onExit}>EXIT → START</button>
             </div>
           </section>
         </div>

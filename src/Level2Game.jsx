@@ -107,7 +107,7 @@ function segmentTime(from, to) {
   return Math.max(FARMER_MIN_SEGMENT, Math.min(FARMER_MAX_SEGMENT, dist / FARMER_SPEED));
 }
 
-export default function Level2Game({ onNextLevel }) {
+export default function Level2Game({ onNextLevel, onExit }) {
   const gameStart = useRef(Date.now());
   const pausedAt = useRef(null);
   const pausedTotal = useRef(0);
@@ -698,6 +698,7 @@ export default function Level2Game({ onNextLevel }) {
         <div className="l2-top-actions">
           <button type="button" onClick={restart} title="Restart">↻</button>
           <button type="button" onClick={togglePause} title={paused ? "Resume" : "Pause"}>{paused ? "▶" : "Ⅱ"}</button>
+          <button type="button" className="l2-exit" onClick={onExit} title="Exit to Start Page" aria-label="Exit Level 2 to Start Page">EXIT</button>
         </div>
         <div className={`l2-clock ${left <= 10 ? "urgent" : ""}`}>
           <strong>⏰ LEVEL 2 — {timeLabel(left)}</strong>
@@ -808,10 +809,17 @@ export default function Level2Game({ onNextLevel }) {
             </div>
 
             <div className={`l2-truck ${driving ? "l2-driving" : ""}`}>
-              <div className="l2-truck-visual">
+              <div className="l2-truck-visual" tabIndex={0} role="button" onClick={(event) => event.currentTarget.focus()} aria-label={`Delivery truck: ${cargo.carrot} carrots, ${cargo.onion} onions, ${cargo.egg} eggs. ${cargoCount(cargo)} of ${TRUCK_LIMIT} products. Tap to see contents.`}>
                 <img src="/delivery-car.png" alt="Delivery truck" draggable="false" />
                 <div className="l2-cargo-icons">
                   {Object.entries(cargo).flatMap(([type, qty]) => Array.from({ length: qty }, (_, i) => <span key={`${type}-${i}`}>{type === "carrot" ? "🥕" : type === "onion" ? "🧅" : "🥚"}</span>))}
+                </div>
+                <div className="l2-truck-tooltip" aria-hidden="true">
+                  <strong>🚚 Truck Load</strong>
+                  <span>🥕 Carrot <b>{cargo.carrot}</b></span>
+                  <span>🧅 Onion <b>{cargo.onion}</b></span>
+                  <span>🥚 Egg <b>{cargo.egg}</b></span>
+                  <span>Total <b>{cargoCount(cargo)}/{TRUCK_LIMIT}</b></span>
                 </div>
               </div>
               <div className="l2-truck-label">📦 {cargoCount(cargo)}/{TRUCK_LIMIT}</div>
@@ -846,7 +854,7 @@ export default function Level2Game({ onNextLevel }) {
         </aside>
       </div>
 
-      {paused && !result && <div className="l2-overlay"><div className="l2-modal"><h2>⏸ Game Paused</h2><p>The clock, crops, chickens and truck are frozen.</p><button type="button" onClick={togglePause}>▶ RESUME</button></div></div>}
+      {paused && !result && <div className="l2-overlay"><div className="l2-modal"><h2>⏸ Game Paused</h2><p>The clock, crops, chickens and truck are frozen.</p><button type="button" onClick={togglePause}>▶ RESUME</button><button type="button" className="farm-exit-modal-button" onClick={onExit}>EXIT → START</button></div></div>}
       {/* Level 2 result uses the SAME visual design as Level 1's result card. */}
       {result && (
         <div className="l2-overlay l2-result-overlay">
@@ -910,6 +918,7 @@ export default function Level2Game({ onNextLevel }) {
               >
                 ↻ PLAY AGAIN
               </button>
+              <button type="button" className="l2-result-button farm-exit-modal-button" onClick={onExit}>EXIT → START</button>
             </div>
           </section>
         </div>

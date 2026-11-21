@@ -9,6 +9,7 @@ import Level2Game from "./Level2Game";
 import Level3Game from "./Level3Game";
 import Level4Game from "./Level4Game";
 import "./StartPage.css";
+import "./MobileLandscape.css";
 
 // Original little farm background tune (music is optional).
 const MELODY = [
@@ -16,8 +17,34 @@ const MELODY = [
   349.23, 392, 440, 523.25, 440, 392, 349.23, 329.63,
 ];
 
+// Preserve the current screen when the browser refreshes this tab.
+// sessionStorage only remembers the screen, not the live farming round.
+const LAST_PAGE_KEY = "littleFarmCurrentPage";
+const VALID_PAGES = new Set([
+  "start", "levels", "rules1", "rules2", "rules3", "rules4",
+  "game1", "game2", "game3", "game4",
+]);
+
+function getInitialPage() {
+  try {
+    const saved = window.sessionStorage.getItem(LAST_PAGE_KEY);
+    return VALID_PAGES.has(saved) ? saved : "start";
+  } catch {
+    return "start";
+  }
+}
+
 export default function StartPage() {
-  const [page, setPage] = useState("start");
+  const [page, setPage] = useState(getInitialPage);
+
+  // Save each navigation change; on refresh open this page again.
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(LAST_PAGE_KEY, page);
+    } catch {
+      // Private-mode / blocked storage: keep the game usable.
+    }
+  }, [page]);
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
@@ -75,7 +102,11 @@ export default function StartPage() {
     if (audioRef.current) audioRef.current.close().catch(() => {});
   }, []);
 
-  const goToStart = () => setPage("start");
+  const goToStart = () => {
+    // Update immediately so a refresh after exiting stays on Start Page.
+    try { window.sessionStorage.setItem(LAST_PAGE_KEY, "start"); } catch { /* storage unavailable */ }
+    setPage("start");
+  };
   const goToLevels = () => setPage("levels");
   const playLevelOne = () => setPage("rules1");
   const startLevelOne = () => setPage("game1");
@@ -131,7 +162,7 @@ export default function StartPage() {
   }
 
   if (page === "game3") {
-    return <Level3Game onNextLevel={goToLevels} />;
+    return <Level3Game onNextLevel={goToLevels} onExit={goToStart} />;
   }
 
   if (page === "rules4") {
@@ -139,16 +170,16 @@ export default function StartPage() {
   }
 
   if (page === "game4") {
-    return <Level4Game onNextLevel={goToLevels} />;
+    return <Level4Game onNextLevel={goToLevels} onExit={goToStart} />;
   }
 
   if (page === "game1") {
-    return <FarmGame onNextLevel={goToLevels} />;
+    return <FarmGame onNextLevel={goToLevels} onExit={goToStart} />;
   }
 
   if (page === "game2") {
     // Level 2 intentionally has no Back button during gameplay.
-    return <Level2Game onNextLevel={goToLevels} />;
+    return <Level2Game onNextLevel={goToLevels} onExit={goToStart} />;
   }
 
   return (
