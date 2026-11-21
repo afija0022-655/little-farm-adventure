@@ -602,3 +602,79 @@ body::before, body::after { content: none !important; }
   .fg-board .fg-go, .l2-board .l2-go, .l3-board .l3-go,
   .l4-board .l4-go, .l5-board .l5-go { left: -57px !important; }
 }
+
+
+/* ===============================================================
+   Portrait flow repair: the farm must occupy document height,
+   never float over the mission cards. Only narrow touch portrait.
+   =============================================================== */
+@media screen and (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
+  html, body, #root { min-height: 100%; height: auto; }
+  .fg-game, .l2-game, .l3-game, .l4-game, .l5-game {
+    display: block !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-x: clip !important;
+  }
+  .fg-header, .l2-topbar, .l3-topbar, .l4-topbar, .l5-topbar {
+    position: relative;
+    height: auto !important;
+    margin-bottom: 10px;
+  }
+  .fg-layout, .l2-layout, .l3-layout, .l4-layout, .l5-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    position: relative !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: 12px !important;
+  }
+  .fg-world, .l2-left, .l3-left, .l4-left, .l5-left {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+  }
+  .fg-board, .l2-board, .l3-board, .l4-board, .l5-board {
+    position: relative !important;
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: clamp(300px, 91vw, 450px) !important;
+    min-height: 300px !important;
+    max-height: 450px !important;
+    overflow: hidden !important;
+    margin-bottom: 0 !important;
+  }
+  .fg-world-header, .l2-heading, .l3-heading, .l4-heading, .l5-heading,
+  .fg-message, .l2-message, .l3-message, .l4-message, .l5-message {
+    position: relative !important;
+    flex: none !important;
+  }
+  .fg-sidebar, .l2-sidebar, .l3-sidebar, .l4-sidebar, .l5-sidebar {
+    position: relative !important;
+    z-index: 1;
+    flex: none !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+  }
+  .fg-panel, .l2-panel, .l3-panel, .l4-panel, .l5-panel {
+    position: relative;
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+}
